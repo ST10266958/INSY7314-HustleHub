@@ -1,0 +1,232 @@
+{
+  "info": {
+    "name": "HustleHub-Part1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"gia.test1@example.com\",\"password\":\"Passw0rd1\"}"
+        },
+        "url": {
+          "raw": "https://localhost:5000/api/auth/register",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "register"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register - Missing Info",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"gia.test2@example.com\"}"
+        },
+        "url": {
+          "raw": "https://localhost:5000/api/auth/register",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "register"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register - Invalid Info",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"not-an-email\",\"password\":\"weak\"}"
+        },
+        "url": {
+          "raw": "https://localhost:5000/api/auth/register",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "register"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register - Duplicate User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"gia.test1@example.com\",\"password\":\"Passw0rd1\"}"
+        },
+        "url": {
+          "raw": "https://localhost:5000/api/auth/register",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "register"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"gia.test1@example.com\",\"password\":\"Passw0rd1\"}"
+        },
+        "url": {
+          "raw": "https://localhost:5000/api/auth/login",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login - Incorrect Password",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"gia.test1@example.com\",\"password\":\"WrongPass1\"}"
+        },
+        "url": {
+          "raw": "https://localhost:5000/api/auth/login",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login - Unknown User",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"doesnotexist@example.com\",\"password\":\"Passw0rd1\"}"
+        },
+        "url": {
+          "raw": "https://localhost:5000/api/auth/login",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login - Missing Info",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"gia.test1@example.com\"}"
+        },
+        "url": {
+          "raw": "https://localhost:5000/api/auth/login",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "login"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Valid JWT",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{jwt_token}}" }
+        ],
+        "url": {
+          "raw": "https://localhost:5000/api/auth/profile",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "profile"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Missing JWT",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://localhost:5000/api/auth/profile",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "profile"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Auth - Invalid JWT",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer garbage.invalid.token" }
+        ],
+        "url": {
+          "raw": "https://localhost:5000/api/auth/profile",
+          "protocol": "https",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "auth", "profile"]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
