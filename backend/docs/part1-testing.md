@@ -17,13 +17,13 @@ This part of Part 1 covers testing of the API endpoints built (registration, log
 | Invalid information | Invalid email format + weak password | 400 Bad Request | Pass |
 | Duplicate user | Same email as an already-registered user | 409 Conflict | Pass |
 
-![Register success](../backend/screenshots/register-success-201.png)
+![Register success](../screenshots/register-success-201.png)
 
-![Register missing info](../backend/screenshots/register-missing-info-400.png)
+![Register missing info](../screenshots/register-missing-info-400.png)
 
-![Register invalid info](../backend/screenshots/register-invalid-info-400.png)
+![Register invalid info](../screenshots/register-invalid-info-400.png)
 
-![Register duplicate user](../backend/screenshots/register-duplicate-409.png)
+![Register duplicate user](../screenshots/register-duplicate-409.png)
 
 ### Login — POST /api/auth/login
 
@@ -34,13 +34,13 @@ This part of Part 1 covers testing of the API endpoints built (registration, log
 | Unknown user | Email not registered in the system | 401 Unauthorized | Pass |
 | Missing information | Email only, no password | 400 Bad Request | Pass |
 
-![Login success](../backend/screenshots/login-success-200.png)
+![Login success](../screenshots/login-success-200.png)
 
-![Login incorrect password](../backend/screenshots/login-incorrect-password-401.png)
+![Login incorrect password](../screenshots/login-incorrect-password-401.png)
 
-![Login unknown user](../backend/screenshots/login-unknown-user-401.png)
+![Login unknown user](../screenshots/login-unknown-user-401.png)
 
-![Login missing info](../backend/screenshots/login-missing-info-400.png)
+![Login missing info](../screenshots/login-missing-info-400.png)
 
 ### Authentication — GET /api/auth/profile
 
@@ -50,11 +50,11 @@ This part of Part 1 covers testing of the API endpoints built (registration, log
 | Missing JWT | No Authorization header | 401 Unauthorized | Pass |
 | Invalid JWT | Malformed/garbage token in header | 401 Unauthorized | Pass |
 
-![Auth valid JWT](../backend/screenshots/auth-valid-jwt-200.png)
+![Auth valid JWT](../screenshots/auth-valid-jwt-200.png)
 
-![Auth missing JWT](../backend/screenshots/auth-missing-jwt-401.png)
+![Auth missing JWT](../screenshots/auth-missing-jwt-401.png)
 
-![Auth invalid JWT](../backend/screenshots/auth-invalid-jwt-401.png)
+![Auth invalid JWT](../screenshots/auth-invalid-jwt-401.png)
 
 ## Security-Specific Notes
 
