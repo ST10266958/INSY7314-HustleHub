@@ -8,7 +8,7 @@ const router = express.Router();
 
 // Authentication endpoints are a prime target for credential stuffing and
 // brute-force attacks, so they get a tighter rate limit than the rest of
-// the API even at this early stage (full policy is expanded in Part 2).
+// the API even at this early stage.
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 20,

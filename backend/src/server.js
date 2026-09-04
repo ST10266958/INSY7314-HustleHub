@@ -2,8 +2,7 @@
 Loads environment variables before the other application files
 are imported.
 
-This ensures that the HTTPS configuration and controllers can
-access process.env values.
+
 */
 require('dotenv').config();
 
@@ -44,8 +43,7 @@ const startServer = async () => {
     /*
     Handles server startup errors.
 
-    For example, EADDRINUSE occurs when another application is
-    already using the selected port.
+    
     */
     server.on('error', (error) => {
       logger.error('The HustleHub+ server could not start.', { message: error.message });

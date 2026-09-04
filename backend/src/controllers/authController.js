@@ -11,9 +11,7 @@ const register = asyncHandler(async (req, res) => {
 
   const existing = userStore.findByEmail(email);
   if (existing) {
-    // Deliberately generic: confirming "this email already has an account"
-    // is a minor enumeration leak but is standard/expected UX for
-    // registration forms, unlike login (see below) where we stay silent.
+    
     throw new AppError('An account with this email already exists.', 409);
   }
 
@@ -35,9 +33,7 @@ const login = asyncHandler(async (req, res) => {
 
   const user = userStore.findByEmail(email);
 
-  // Same error message and (roughly) same code path whether the email
-  // doesn't exist or the password is wrong, so an attacker can't use the
-  // response to enumerate which emails are registered.
+  
   if (!user) {
     logger.warn('Login failed: unknown email', { email });
     throw new AppError('Invalid email or password.', 401);

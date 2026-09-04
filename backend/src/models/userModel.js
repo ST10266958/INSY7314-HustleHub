@@ -54,10 +54,7 @@ function findById(id) {
  * this layer never accepts or persists plain-text passwords.
  */
 function create({ email, passwordHash, role }) {
-  // Defense-in-depth: even though validationMiddleware already restricts
-  // self-registration to client/freelancer, the model layer independently
-  // refuses to persist any value outside the known role set at all - so a
-  // bug or bypass upstream can't silently create a user with a bogus role.
+  
   if (!Object.values(ROLES).includes(role)) {
     throw new Error(`Cannot create user with unknown role: ${role}`);
   }
