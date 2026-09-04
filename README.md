@@ -158,6 +158,10 @@ All Part 1 endpoints were tested using Postman. The full collection — covering
 
 Full test case documentation, including expected vs. actual results and notes on the security-specific tests, is available at [`backend/docs/part1-testing.md`](backend/docs/part1-testing.md).
 
+## References
+
+A full reference list covering the technologies, libraries, and security guidance used in this build is available at [`backend/docs/references.md`](backend/docs/references.md)
+
 ### Architecture Diagram
 
 See below for a visual overview of how a request flows through the system — from the client, over HTTPS, through the security middleware, into the auth controller, and down to the data store.
