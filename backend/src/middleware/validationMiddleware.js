@@ -31,4 +31,34 @@ const loginValidation = [
   handleValidation,
 ];
 
-module.exports = { registerValidation, loginValidation };
+const createGigValidation = [
+  body('title').trim().notEmpty().withMessage('Title is required.')
+    .isLength({ max: 120 }).withMessage('Title must be under 120 characters.'),
+  body('description').trim().notEmpty().withMessage('Description is required.')
+    .isLength({ max: 2000 }).withMessage('Description must be under 2000 characters.'),
+  body('price').isFloat({ min: 0 }).withMessage('Price must be a positive number.'),
+  body('category').optional().trim().isLength({ max: 50 }).withMessage('Category must be under 50 characters.'),
+  handleValidation,
+];
+
+const updateGigValidation = [
+  body('title').optional().trim().isLength({ min: 1, max: 120 }).withMessage('Title must be under 120 characters.'),
+  body('description').optional().trim().isLength({ min: 1, max: 2000 }).withMessage('Description must be under 2000 characters.'),
+  body('price').optional().isFloat({ min: 0 }).withMessage('Price must be a positive number.'),
+  body('category').optional().trim().isLength({ max: 50 }).withMessage('Category must be under 50 characters.'),
+  body('isActive').optional().isBoolean().withMessage('isActive must be true or false.'),
+  handleValidation,
+];
+
+const bookingValidation = [
+  body('gigId').isMongoId().withMessage('A valid gig id is required.'),
+  handleValidation,
+];
+
+module.exports = {
+  registerValidation,
+  loginValidation,
+  createGigValidation,
+  updateGigValidation,
+  bookingValidation,
+};

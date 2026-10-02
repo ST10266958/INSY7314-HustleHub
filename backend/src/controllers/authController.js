@@ -9,14 +9,14 @@ const { ROLES } = require('../constants/roles');
 const register = asyncHandler(async (req, res) => {
   const { email, password, role = ROLES.CLIENT } = req.body;
 
-  const existing = userStore.findByEmail(email);
+  const existing = await userStore.findByEmail(email);
   if (existing) {
     
     throw new AppError('An account with this email already exists.', 409);
   }
 
   const passwordHash = await hashPassword(password);
-  const user = userStore.create({ email, passwordHash, role });
+  const user = await userStore.create({ email, passwordHash, role });
 
   logger.info('User registered', { userId: user.id, role: user.role });
 
@@ -31,7 +31,7 @@ const register = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = userStore.findByEmail(email);
+  const user = await userStore.findByEmail(email);
 
   
   if (!user) {
@@ -58,7 +58,7 @@ const login = asyncHandler(async (req, res) => {
 // A minimal protected route used to prove that JWT validation is enforced
 // on requests beyond login, as required by the brief.
 const getProfile = asyncHandler(async (req, res) => {
-  const user = userStore.findById(req.user.sub);
+  const user = await userStore.findById(req.user.sub);
   if (!user) {
     throw new AppError('User no longer exists.', 404);
   }

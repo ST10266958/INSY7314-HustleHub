@@ -26,11 +26,14 @@ Imports the structured logger and the centralised environment config.
 */
 const logger = require('./config/logger');
 const { port, appName, nodeEnv } = require('./config/env');
+const connectDB = require('./config/db');
 
 
 
 const startServer = async () => {
   try {
+    await connectDB();
+
     const server = https.createServer(httpsOptions, app);
 
     /*

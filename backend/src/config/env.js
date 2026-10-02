@@ -13,6 +13,7 @@ module.exports = {
   port: parseInt(process.env.PORT, 10) || 5000,
   nodeEnv: process.env.NODE_ENV || 'development',
   jwtSecret: required('JWT_SECRET'),
+  mongoUri: required('MONGODB_URI'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1h',
   bcryptSaltRounds: parseInt(process.env.BCRYPT_SALT_ROUNDS, 10) || 12,
   clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
