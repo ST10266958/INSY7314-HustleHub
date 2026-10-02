@@ -5,11 +5,28 @@ const morgan = require('morgan');
 const { clientOrigin } = require('./config/env');
 const logger = require('./config/logger');
 const authRoutes = require('./routes/authRoutes');
+const gigRoutes = require('./routes/gigRoutes');
+const bookingRoutes = require('./routes/bookingRoutes');
+const incomeRoutes = require('./routes/incomeRoutes');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:'],
+        connectSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+  })
+);
 app.use(cors({ origin: clientOrigin, credentials: true }));
 app.use(express.json({ limit: '10kb' }));
 app.use(morgan('combined', { stream: { write: (msg) => logger.info(msg.trim()) } }));
@@ -19,6 +36,9 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/gigs', gigRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/income', incomeRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
