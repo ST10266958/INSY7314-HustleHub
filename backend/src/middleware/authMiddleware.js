@@ -2,12 +2,9 @@ const { verifyToken } = require('../utils/jwt');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('./asyncHandler');
 
-/**
+/*
  * Protects a route: requires a valid "Authorization: Bearer <token>" header.
- * On success, attaches the decoded token payload to req.user so downstream
- * handlers know who is making the request (and, in Part 2, can use
- * req.user.role for RBAC checks).
- */
+*/
 const requireAuth = asyncHandler(async (req, res, next) => {
   const header = req.headers.authorization || '';
   const [scheme, token] = header.split(' ');

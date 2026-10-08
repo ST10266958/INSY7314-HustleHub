@@ -9,16 +9,14 @@ const { ROLES } = require('../constants/roles');
 const register = asyncHandler(async (req, res) => {
   const { email, password, role = ROLES.CLIENT } = req.body;
 
-  const existing = userStore.findByEmail(email);
+  const existing = await userStore.findByEmail(email);
   if (existing) {
-    // Deliberately generic: confirming "this email already has an account"
-    // is a minor enumeration leak but is standard/expected UX for
-    // registration forms, unlike login (see below) where we stay silent.
+    
     throw new AppError('An account with this email already exists.', 409);
   }
 
   const passwordHash = await hashPassword(password);
-  const user = userStore.create({ email, passwordHash, role });
+  const user = await userStore.create({ email, passwordHash, role });
 
   logger.info('User registered', { userId: user.id, role: user.role });
 
@@ -33,11 +31,9 @@ const register = asyncHandler(async (req, res) => {
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  const user = userStore.findByEmail(email);
+  const user = await userStore.findByEmail(email);
 
-  // Same error message and (roughly) same code path whether the email
-  // doesn't exist or the password is wrong, so an attacker can't use the
-  // response to enumerate which emails are registered.
+  
   if (!user) {
     logger.warn('Login failed: unknown email', { email });
     throw new AppError('Invalid email or password.', 401);
@@ -62,7 +58,7 @@ const login = asyncHandler(async (req, res) => {
 // A minimal protected route used to prove that JWT validation is enforced
 // on requests beyond login, as required by the brief.
 const getProfile = asyncHandler(async (req, res) => {
-  const user = userStore.findById(req.user.sub);
+  const user = await userStore.findById(req.user.sub);
   if (!user) {
     throw new AppError('User no longer exists.', 404);
   }
