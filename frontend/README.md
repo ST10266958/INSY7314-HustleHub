@@ -48,3 +48,7 @@ See `docs/part2-frontend-testing.md` and `docs/evidence/` for the actual recorde
 ## Scope boundaries
 
 No fabricated transaction-list endpoint, admin provisioning, tax calculator, real payment gateway, Docker or CI/CD was added. The supplied API offers a booking-associated transaction in the creation response but no standalone transaction history endpoint. Tax and wider admin functionality appear in the overall project requirements, not Mel's assigned Part 2 API contract; confirm these with the team for the appropriate part. Shared README, demonstration video and final university-repository mirroring remain end-of-team tasks.
+
+## Frontend Content Security Policy
+
+Vite development and production-preview document responses now carry separate CSP policies. Restart the dev server after this change. See [CSP configuration, verification and deployment limitations](docs/frontend-csp.md). Static production hosting must emit the strict response headers itself; the headers are not embedded in the build output.
