@@ -1,9 +1,0 @@
-[
-  {
-    "id": "1cfc34f6-47f9-4944-8b0d-9f9d70e6aa9b",
-    "email": "gia.test1@example.com",
-    "passwordHash": "$2b$12$W60EiYX9brofFHkm0I9PaeGE0PO6KwwM/kdiBk3fYPl8TqXUPRO/C",
-    "role": "client",
-    "createdAt": "2026-08-31T17:46:02.654Z"
-  }
-]
