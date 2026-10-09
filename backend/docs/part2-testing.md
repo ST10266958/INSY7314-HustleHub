@@ -14,11 +14,11 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 | Register freelancer A | Valid email + valid password + role "freelancer" | 201 Created, returns user + JWT | Pass |
 | Register freelancer B | Valid email + valid password + role "freelancer" | 201 Created, returns user + JWT | Pass |
 
-![Register - Client](../screenshots/Register - Client.png)
+![Register - Client](../screenshots/Register-Client.png)
 
-![Register - Freelancer A](../screenshots/Register - Freelancer A.png)
+![Register - Freelancer A](../screenshots/Register-Freelancer-A.png)
 
-![Register - Freelancer B](../screenshots/Register - Freelancer B.png)
+![Register - Freelancer B](../screenshots/Register-Freelancer-B.png)
 
 ### Authentication — POST /api/auth/register and /api/auth/login
 
@@ -31,17 +31,17 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 | Successful login | Registered email + correct password | 200 OK, returns user + JWT | Pass |
 | Profile with valid token | Valid Bearer token | 200 OK | Pass |
 
-![Register - Duplicate User](../screenshots/Register - Duplicate User.png)
+![Register - Duplicate User](../screenshots/Register-Duplicate-User.png)
 
-![Register - Weak Password](../screenshots/Register - Weak Password.png)
+![Register - Weak Password](../screenshots/Register-Weak-Password.png)
 
-![Register - Invalid Role (Admin)](../screenshots/Register - Invalid Role (Admin).png)
+![Register - Invalid Role (Admin)](../screenshots/Register-Invalid-Role-(Admin).png)
 
-![Login - Incorrect Password](../screenshots/Login - Incorrect Password.png)
+![Login - Incorrect Password](../screenshots/Login-Incorrect-Password.png)
 
-![Login - Success](../screenshots/Login - Success.png)
+![Login - Success](../screenshots/Login-Success.png)
 
-![Auth - Valid JWT](../screenshots/Auth - Valid JWT.png)
+![Auth - Valid JWT](../screenshots/Auth-Valid-JWT.png)
 
 ### Gig management — owning freelancer — /api/gigs
 
@@ -56,21 +56,21 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 | Public gig list | No token, GET /gigs | 200 OK | Pass |
 | Public gig by id | No token, GET /gigs/:id | 200 OK | Pass |
 
-![A Creates Gig - Success](../screenshots/A Creates Gig - Success.png)
+![A Creates Gig - Success](../screenshots/A-Creates-Gig-Success.png)
 
-![A Creates Second Gig (To Delete)](../screenshots/A Creates Second Gig (To Delete).png)
+![A Creates Second Gig (To Delete)](../screenshots/A-Creates-Second-Gig-(To-Delete).png)
 
-![A Lists Own Gigs](../screenshots/A Lists Own Gigs.png)
+![A Lists Own Gigs](../screenshots/A-Lists-Own-Gigs.png)
 
-![A Updates Gig](../screenshots/A Updates Gig.png)
+![A Updates Gig](../screenshots/A-Updates-Gig.png)
 
-![A Deletes Second Gig](../screenshots/A Deletes Second Gig.png)
+![A Deletes Second Gig](../screenshots/A-Deletes-Second-Gig.png)
 
-![A Deletes It Again - Not Found](../screenshots/A Deletes It Again - Not Found.png)
+![A Deletes It Again - Not Found](../screenshots/A-Deletes-It-Again-Not-Found.png)
 
-![Public - List Gigs (No Token)](../screenshots/Public - List Gigs (No Token).png)
+![Public - List Gigs (No Token)](../screenshots/Public-List-Gigs-(No-Token).png)
 
-![Public - Get Gig By ID (No Token)](../screenshots/Public - Get Gig By ID (No Token).png)
+![Public - Get Gig By ID (No Token)](../screenshots/Public-Get-Gig-By-ID-(No-Token).png)
 
 ### Gig management — wrong owner and wrong role
 
@@ -83,17 +83,17 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 | Client deletes a gig | Client token, DELETE /gigs/:id | 403 Forbidden | Pass |
 | Client views /gigs/mine | Client token | 403 Forbidden | Pass |
 
-![B Updates A's Gig - Not Found](../screenshots/B Updates A's Gig - Not Found.png)
+![B Updates A's Gig - Not Found](../screenshots/B-Updates-As-Gig-Not-Found.png)
 
-![B Deletes A's Gig - Not Found](../screenshots/B Deletes A's Gig - Not Found.png)
+![B Deletes A's Gig - Not Found](../screenshots/B-Deletes-As-Gig-Not-Found.png)
 
-![Client Creates Gig - Forbidden](../screenshots/Client Creates Gig - Forbidden.png)
+![Client Creates Gig - Forbidden](../screenshots/Client-Creates-Gig-Forbidden.png)
 
-![Client Updates Gig - Forbidden](../screenshots/Client Updates Gig - Forbidden.png)
+![Client Updates Gig - Forbidden](../screenshots/Client-Updates-Gig-Forbidden.png)
 
-![Client Deletes Gig - Forbidden](../screenshots/Client Deletes Gig - Forbidden.png)
+![Client Deletes Gig - Forbidden](../screenshots/Client-Deletes-Gig-Forbidden.png)
 
-![Client Lists Own Gigs - Forbidden](../screenshots/Client Lists Own Gigs - Forbidden.png)
+![Client Lists Own Gigs - Forbidden](../screenshots/Client-Lists-Own-Gigs-Forbidden.png)
 
 ### Gig validation
 
@@ -109,23 +109,23 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 | GET gig with malformed id | /gigs/abc | 400 or 404 | **Fail (500)** |
 | DELETE gig with malformed id | /gigs/abc | 400 or 404 | **Fail (500)** |
 
-![Missing Title](../screenshots/Missing Title.png)
+![Missing Title](../screenshots/Missing-Title.png)
 
-![Negative Price](../screenshots/Negative Price.png)
+![Negative Price](../screenshots/Negative-Price.png)
 
-![Non-Numeric Price](../screenshots/Non-Numeric Price.png)
+![Non-Numeric Price](../screenshots/Non-Numeric-Price.png)
 
-![Description Too Long](../screenshots/Description Too Long.png)
+![Description Too Long](../screenshots/Description-Too-Long.png)
 
-![Title Too Long](../screenshots/Title Too Long.png)
+![Title Too Long](../screenshots/Title-Too-Long.png)
 
-![Update With Negative Price](../screenshots/Update With Negative Price.png)
+![Update With Negative Price](../screenshots/Update-With-Negative-Price.png)
 
-![Update isActive Not Boolean](../screenshots/Update isActive Not Boolean.png)
+![Update isActive Not Boolean](../screenshots/Update-isActive-Not-Boolean.png)
 
-![Malformed Gig ID - Get](../screenshots/Malformed Gig ID - Get.png)
+![Malformed Gig ID - Get](../screenshots/Malformed-Gig-ID-Get.png)
 
-![Malformed Gig ID - Delete](../screenshots/Malformed Gig ID - Delete.png)
+![Malformed Gig ID - Delete](../screenshots/Malformed-Gig-ID-Delete.png)
 
 ### Bookings and transactions — POST /api/bookings
 
@@ -138,17 +138,17 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 | Missing gigId | Empty body | 400 Bad Request | Pass |
 | Gig that does not exist | Valid id format, no matching gig | 404 Not Found | Pass |
 
-![Client Books A's Gig - Success](../screenshots/Client Books A's Gig - Success.png)
+![Client Books A's Gig - Success](../screenshots/Client-Books-As-Gig-Success.png)
 
-![A Books Own Gig - Forbidden](../screenshots/A Books Own Gig - Forbidden.png)
+![A Books Own Gig - Forbidden](../screenshots/A-Books-Own-Gig-Forbidden.png)
 
-![B Books A's Gig - Forbidden](../screenshots/B Books A's Gig - Forbidden.png)
+![B Books A's Gig - Forbidden](../screenshots/B-Books-As-Gig-Forbidden.png)
 
-![Invalid Gig ID](../screenshots/Invalid Gig ID.png)
+![Invalid Gig ID](../screenshots/Invalid-Gig-ID.png)
 
-![Missing Gig ID](../screenshots/Missing Gig ID.png)
+![Missing Gig ID](../screenshots/Missing-Gig-ID.png)
 
-![Non-Existent Gig](../screenshots/Non-Existent Gig.png)
+![Non-Existent Gig](../screenshots/Non-Existent-Gig.png)
 
 ### Booking and income views
 
@@ -162,19 +162,19 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 | Client views freelancer bookings | GET /bookings/freelancer | 403 Forbidden | Pass |
 | Freelancer views client bookings | GET /bookings/client | 403 Forbidden | Pass |
 
-![Client Views Own Bookings](../screenshots/Client Views Own Bookings.png)
+![Client Views Own Bookings](../screenshots/Client-Views-Own-Bookings.png)
 
-![A Views Bookings On Their Gigs](../screenshots/A Views Bookings On Their Gigs.png)
+![A Views Bookings On Their Gigs](../screenshots/A-Views-Bookings-On-Their-Gigs.png)
 
-![A Views Income](../screenshots/A Views Income.png)
+![A Views Income](../screenshots/A-Views-Income.png)
 
-![B Views Income - Zero Sales](../screenshots/B Views Income - Zero Sales.png)
+![B Views Income - Zero Sales](../screenshots/B-Views-Income-Zero-Sales.png)
 
-![Client Views Income - Forbidden](../screenshots/Client Views Income - Forbidden.png)
+![Client Views Income - Forbidden](../screenshots/Client-Views-Income-Forbidden.png)
 
-![Client Views Freelancer Bookings - Forbidden](../screenshots/Client Views Freelancer Bookings - Forbidden.png)
+![Client Views Freelancer Bookings - Forbidden](../screenshots/Client-Views-Freelancer-Bookings-Forbidden.png)
 
-![Freelancer Views Client Bookings - Forbidden](../screenshots/Freelancer Views Client Bookings - Forbidden.png)
+![Freelancer Views Client Bookings - Forbidden](../screenshots/Freelancer-Views-Client-Bookings-Forbidden.png)
 
 ### Missing, invalid and expired tokens
 
@@ -186,23 +186,23 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 | Token with a bad signature | Bearer token with a made-up signature | 401 Unauthorized | Pass |
 | Expired token | Correctly signed token that expired an hour ago | 401 Unauthorized, "Session expired" message | Pass |
 
-![Profile - No Token](../screenshots/Profile - No Token.png)
+![Profile - No Token](../screenshots/Profile-No-Token.png)
 
-![Client Bookings - No Token](../screenshots/Client Bookings - No Token.png)
+![Client Bookings - No Token](../screenshots/Client-Bookings-No-Token.png)
 
-![Income - No Token](../screenshots/Income - No Token.png)
+![Income - No Token](../screenshots/Income-No-Token.png)
 
-![Create Gig - No Token](../screenshots/Create Gig - No Token.png)
+![Create Gig - No Token](../screenshots/Create-Gig-No-Token.png)
 
-![Create Booking - No Token](../screenshots/Create Booking - No Token.png)
+![Create Booking - No Token](../screenshots/Create-Booking-No-Token.png)
 
-![Wrong Auth Scheme](../screenshots/Wrong Auth Scheme.png)
+![Wrong Auth Scheme](../screenshots/Wrong-Auth-Scheme.png)
 
-![Malformed Token](../screenshots/Malformed Token.png)
+![Malformed Token](../screenshots/Malformed-Token.png)
 
-![Invalid JWT Signature](../screenshots/Invalid JWT Signature.png)
+![Invalid JWT Signature](../screenshots/Invalid-JWT-Signature.png)
 
-![Expired JWT](../screenshots/Expired JWT.png)
+![Expired JWT](../screenshots/Expired-JWT.png)
 
 ### Rate limiting — POST /api/bookings
 
@@ -212,7 +212,7 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 
 The booking limiter is set to 30 requests per 15 minutes. Four booking requests had already been counted earlier in the run (one successful booking, two 400s and one 404), then 26 more bookings in the burst returned 201, which makes 30. The very next request returned 429 with the message "Too many booking attempts. Please try again later."
 
-![Booking Burst - Rate Limited](../screenshots/Booking Burst - Rate Limited.png)
+![Booking Burst - Rate Limited](../screenshots/Booking-Burst-Rate-Limited.png)
 
 ### Newman Run — Terminal Output
 
