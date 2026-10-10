@@ -1,0 +1,1 @@
+module.exports={testEnvironment:'jsdom',setupFilesAfterEnv:['<rootDir>/src/test/setup.js'],moduleNameMapper:{'\\.css$':'<rootDir>/src/test/styleMock.cjs'},collectCoverageFrom:['src/**/*.{js,jsx}','!src/main.jsx','!src/test/**'],coverageReporters:['text','lcov'],testMatch:['**/*.test.[jt]s?(x)']};

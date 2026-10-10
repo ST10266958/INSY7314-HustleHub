@@ -1,0 +1,13 @@
+import {render,screen} from '@testing-library/react';
+import {MemoryRouter,Routes,Route} from 'react-router-dom';
+import {GigList,ProtectedRoute,BookingList} from './components';
+import {useAuth} from './auth';
+jest.mock('./auth',()=>({useAuth:jest.fn()}));
+const wrap=element=>render(<MemoryRouter future={{v7_startTransition:true,v7_relativeSplatPath:true}}>{element}</MemoryRouter>);
+test('renders gig title, price and detail link',()=>{wrap(<GigList gigs={[{_id:'abc',title:'Logo design',description:'A unique logo',price:250,category:'Design'}]}/>);expect(screen.getByRole('link',{name:'Logo design'})).toHaveAttribute('href','/gigs/abc');expect(screen.getByText(/250/)).toBeInTheDocument();expect(screen.getByText('A unique logo')).toBeInTheDocument();});
+test('shows empty state without gigs',()=>{wrap(<GigList gigs={[]}/>);expect(screen.getByText(/No gigs available/)).toBeInTheDocument();});
+test('React escapes untrusted gig content instead of executing markup',()=>{const title='<img src=x onerror=alert(1)>';const {container}=wrap(<GigList gigs={[{_id:'abc',title,description:'Safe',price:0}]}/>);expect(screen.getByRole('link',{name:title})).toBeInTheDocument();expect(container.querySelector('img')).toBeNull();});
+test('redirects anonymous users to login',()=>{useAuth.mockReturnValue({user:null});wrap(<Routes><Route path="/" element={<ProtectedRoute role="freelancer"><p>Private data</p></ProtectedRoute>}/><Route path="/login" element={<p>Login destination</p>}/></Routes>);expect(screen.getByText('Login destination')).toBeInTheDocument();expect(screen.queryByText('Private data')).not.toBeInTheDocument();});
+test('wrong role cannot see dashboard',()=>{useAuth.mockReturnValue({user:{role:'client'}});wrap(<ProtectedRoute role="freelancer"><p>Private data</p></ProtectedRoute>);expect(screen.getByText('Access restricted')).toBeInTheDocument();expect(screen.queryByText('Private data')).not.toBeInTheDocument();});
+test('freelancer can see own dashboard page',()=>{useAuth.mockReturnValue({user:{role:'freelancer'}});wrap(<ProtectedRoute role="freelancer"><p>Private data</p></ProtectedRoute>);expect(screen.getByText('Private data')).toBeInTheDocument();});
+test('deleted gig does not break booking rendering',()=>{wrap(<BookingList bookings={[{_id:'booking',gig:null,amount:10,status:'confirmed'}]}/>);expect(screen.getByText('Unavailable gig')).toBeInTheDocument();});

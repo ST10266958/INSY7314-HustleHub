@@ -1,0 +1,25 @@
+npm : npm warn Unknown env config "store-dir". This will stop working in the next major version of npm. See `npm help 
+npmrc` for supported config options.
+At line:5 char:290
++ ... validation; npm test -- --json --outputFile=docs/evidence/csp-jest-re ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...config options.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+> hustlehub-frontend@1.0.0 test
+> jest --runInBand --json --outputFile=docs/evidence/csp-jest-results.json
+
+PASS src/test/csp.test.js (13.287 s)
+PASS src/pages/Dashboard.test.jsx (6.363 s)
+PASS src/pages/AuthPage.test.jsx
+PASS src/pages/GigDetail.test.jsx
+PASS src/components.test.jsx
+PASS src/api.test.js
+
+Test Suites: 6 passed, 6 total
+Tests:       36 passed, 36 total
+Snapshots:   0 total
+Time:        39.947 s
+Ran all test suites.
+Test results written to: docs\evidence\csp-jest-results.json
