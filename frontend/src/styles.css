@@ -7,3 +7,6 @@
 
 /* Accessible validation feedback, using external CSS to preserve CSP. */
 .form-fields{border:0;padding:0;margin:0;min-width:0}.field-error{color:#8b2934;font-size:12px;font-weight:500;margin:-10px 0 16px}label .field-error{margin:6px 0 0}input[aria-invalid="true"],textarea[aria-invalid="true"],select[aria-invalid="true"]{border-color:#b7454e;background:#fff8f6}.auth-panel .form-fields>button{width:100%;margin-top:6px}
+
+/* Admin dashboard tabs */
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}.tab{min-height:40px;padding:8px 16px}.tab.active{background:var(--green);color:white;border-color:var(--green)}

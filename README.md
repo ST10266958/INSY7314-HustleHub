@@ -14,7 +14,7 @@ Security is treated as a core requirement. The platform handles user credentials
 |---|---|
 | **Client** | Browses gigs, books them, and views their own bookings |
 | **Freelancer** | Creates and manages their own gigs, views bookings made against them, and tracks income |
-| **Admin** | Role is defined in the system but cannot be self-registered. No admin-only endpoints exist yet. |
+| **Admin** | Oversight role. Cannot be self-registered; created with a script. Views all users, gigs, bookings and transactions, and removes any gig, through the admin dashboard in the React app or the API. |
 
 ## Development Approach
 
@@ -31,7 +31,8 @@ The project is built incrementally across three parts:
 - **Bookings:** clients book a gig and get a simulated confirmation. Every booking creates a transaction record associated with the client and the freelancer.
 - **Income tracking:** freelancers see their total income and number of completed bookings
 - **Role-based access control:** each endpoint is restricted by role, and users can only modify or delete resources they own
-- **React frontend:** public gig browsing, registration and login, client booking flow and booking history, and a freelancer dashboard (own gigs, bookings, income)
+- **Admin oversight:** an admin account (created with a script) can list all users, gigs, bookings and transactions and remove any gig, through the API or the admin dashboard
+- **React frontend:** public gig browsing, registration and login, client booking flow and booking history, a freelancer dashboard (own gigs, bookings, income), and an admin dashboard (users, gigs, bookings, transactions, gig removal)
 
 ## Architecture
 
@@ -71,14 +72,15 @@ backend/
 │   ├── server.js                 Connects to MongoDB, then starts the HTTPS server
 │   ├── config/                   env.js, db.js, httpsConfig.js, logger.js
 │   ├── constants/                roles.js, bookingStatus.js
-│   ├── controllers/              auth, gig, booking, income
+│   ├── controllers/              auth, gig, booking, income, admin
 │   ├── middleware/               authMiddleware (JWT), rbacMiddleware (roles),
 │   │                             validationMiddleware, errorHandler, asyncHandler
 │   ├── models/                   User, Gig, Booking, Transaction (Mongoose)
-│   ├── routes/                   authRoutes, gigRoutes, bookingRoutes, incomeRoutes
+│   ├── routes/                   authRoutes, gigRoutes, bookingRoutes, incomeRoutes, adminRoutes
 │   └── utils/                    AppError, jwt, password
 ├── postman/                      Postman collections and Newman output
 ├── docs/                         Testing documentation, references, diagram
+├── scripts/                      createAdmin.js (creates an admin account)
 └── screenshots/                  Test evidence
 
 frontend/
@@ -86,7 +88,7 @@ frontend/
 │   ├── App.jsx, main.jsx         App shell and routes
 │   ├── api.js, config.js         API client and API URL
 │   ├── auth.jsx, components.jsx  Auth context, route guards, shared components
-│   ├── pages/                    AuthPage, Gigs, GigDetail, Dashboard, Bookings
+│   ├── pages/                    AuthPage, Gigs, GigDetail, Dashboard, Bookings, AdminDashboard
 │   └── test/                     Test setup and CSP tests
 ├── csp.js, vite.config.js        Content Security Policy headers and Vite config
 └── docs/                         Frontend testing and CSP documentation, evidence
@@ -112,6 +114,11 @@ Base URL: `https://localhost:5000`. All protected routes need `Authorization: Be
 | GET | `/api/bookings/client` | Client | Your bookings as a client |
 | GET | `/api/bookings/freelancer` | Freelancer | Bookings made against your gigs |
 | GET | `/api/income` | Freelancer | Your total income and completed bookings |
+| GET | `/api/admin/users` | Admin | List all users (email, role and created date only) |
+| GET | `/api/admin/gigs` | Admin | List all gigs, including inactive ones |
+| GET | `/api/admin/bookings` | Admin | List all bookings |
+| GET | `/api/admin/transactions` | Admin | List all transactions |
+| DELETE | `/api/admin/gigs/:id` | Admin | Remove any gig |
 
 ## Security Measures
 
@@ -124,15 +131,17 @@ Login returns a signed JWT with an expiry (1 hour by default). Every protected r
 ### Role-based access control and ownership
 `rbacMiddleware` restricts each route to specific roles and runs before the controller. A role mismatch returns `403`.
 
-| Action | Client | Freelancer | Not logged in |
-|---|---|---|---|
-| Browse gigs | Yes | Yes | Yes |
-| Create, update, delete gigs | No (403) | Own gigs only | No (401) |
-| Create a booking | Yes | No (403) | No (401) |
-| View own bookings | Client view | Freelancer view | No (401) |
-| View income | No (403) | Yes | No (401) |
+| Action | Client | Freelancer | Admin | Not logged in |
+|---|---|---|---|---|
+| Browse gigs | Yes | Yes | Yes | Yes |
+| Create, update, delete gigs | No (403) | Own gigs only | No (403) | No (401) |
+| Remove any gig | No (403) | No (403) | Yes | No (401) |
+| Create a booking | Yes | No (403) | No (403) | No (401) |
+| View own bookings | Client view | Freelancer view | No (403) | No (401) |
+| View income | No (403) | Yes | No (403) | No (401) |
+| View all users, gigs, bookings and transactions | No (403) | No (403) | Yes | No (401) |
 
-Ownership is enforced in the controller. Editing or deleting a gig you do not own returns `404 Gig not found`, the same response as a gig that does not exist, so error messages cannot be used to discover which gig ids belong to other users. Registration only accepts the `client` and `freelancer` roles, so a user cannot create an admin account.
+Ownership is enforced in the controller. Editing or deleting a gig you do not own returns `404 Gig not found`, the same response as a gig that does not exist, so error messages cannot be used to discover which gig ids belong to other users. Registration only accepts the `client` and `freelancer` roles, so a user cannot create an admin account. Admin accounts are created with `npm run create-admin`, and every gig an admin removes is written to the server log. The admin user list never includes password hashes.
 
 ### Input validation and sanitisation
 All request bodies are validated with express-validator before reaching any controller: email format (normalised), password strength, gig field types and length limits, price as a number, `isActive` as a boolean, and booking `gigId` as a valid MongoDB id. Values must be the expected type, so object payloads such as `{"$ne": null}` are rejected with `400` before any database query runs. JSON bodies are limited to 10 KB. On the frontend, React escapes all rendered text and the UI never injects user-supplied HTML.
@@ -222,6 +231,20 @@ Open **http://127.0.0.1:5173**, the address Vite prints in the terminal. It must
 
 If the app shows "Cannot reach the API", check that the backend is running, that its certificate is trusted, and that `CLIENT_ORIGIN` matches the address in your browser exactly (`localhost` and `127.0.0.1` count as different origins).
 
+### 4. Admin account (optional)
+
+The admin role cannot be created through the app. From the `backend` folder, with `.env` set up as above, run:
+
+```powershell
+$env:ADMIN_EMAIL="admin@example.com"
+$env:ADMIN_PASSWORD="<a strong password>"
+npm run create-admin
+```
+
+On macOS or Linux: `ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD='<a strong password>' npm run create-admin`
+
+The password must meet the same rules as registration. Sign in through the React app (you are taken to `/admin`), or use `POST /api/auth/login` to get an admin token for Postman.
+
 ## Testing
 
 ### Backend: Postman and Newman
@@ -251,7 +274,7 @@ npm run test:coverage    # with coverage
 npm run build            # production build
 ```
 
-36 tests across six suites pass. They cover component rendering, user interaction (login, registration, booking, gig create/edit/delete), route protection, the API client's error handling, and CSP regression checks. API responses are mocked in these tests, so they do not prove a live backend integration. Details and evidence are in [`frontend/docs/part2-frontend-testing.md`](frontend/docs/part2-frontend-testing.md) and `frontend/docs/evidence/`.
+90 tests across ten suites pass. They cover component rendering, user interaction (login, registration, booking, gig create/edit/delete, admin dashboard and gig removal), route protection, the API client's error handling, and CSP regression checks. API responses are mocked in these tests, so they do not prove a live backend integration. Details and evidence are in [`frontend/docs/part2-frontend-testing.md`](frontend/docs/part2-frontend-testing.md) and `frontend/docs/evidence/`.
 
 ### Part 1 testing
 
@@ -260,7 +283,8 @@ The Part 1 collection is at [`backend/postman/HustleHub-Part1.postman_collection
 ## Limitations
 
 - There is no standalone transaction history endpoint. A transaction is returned in the response when a booking is created.
-- Estimated tax calculations and admin-only features are not implemented in Part 2.
+- Estimated tax calculations are not implemented in Part 2.
+- Admin lists show the 200 most recent records, with no paging or search. Removing a gig that already has bookings leaves those bookings without a gig; the dashboard shows them as "Unavailable gig".
 - The frontend session is lost on page refresh by design (see Frontend session handling).
 
 ## Demonstration Videos
@@ -292,6 +316,7 @@ A full reference list covering the technologies, libraries and security guidance
 - ✅ Role-based access control on all protected routes
 - ✅ Input validation, rate limiting, Helmet and Content Security Policy
 - ✅ React frontend (browse, register, login, booking, freelancer dashboard)
+- ✅ Admin role, account creation script, oversight endpoints and admin dashboard
 - ✅ Postman collection and Newman evidence
 - ✅ Frontend tests
 - ⬜ Part 2 demonstration video

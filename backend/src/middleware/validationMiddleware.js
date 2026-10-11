@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 const AppError = require('../utils/AppError');
 const { SELF_REGISTERABLE_ROLES } = require('../constants/roles');
 
@@ -55,10 +55,16 @@ const bookingValidation = [
   handleValidation,
 ];
 
+const mongoIdParamValidation = [
+  param('id').isMongoId().withMessage('A valid id is required.'),
+  handleValidation,
+];
+
 module.exports = {
   registerValidation,
   loginValidation,
   createGigValidation,
   updateGigValidation,
   bookingValidation,
+  mongoIdParamValidation,
 };
