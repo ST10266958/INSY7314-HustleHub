@@ -1,0 +1,12 @@
+import {render,screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import {MemoryRouter} from 'react-router-dom';
+import Bookings from './Bookings';
+import Gigs from './Gigs';
+import {useAuth} from '../auth';
+jest.mock('../auth',()=>({useAuth:jest.fn()}));
+const api=jest.fn();
+beforeEach(()=>{api.mockReset();useAuth.mockReturnValue({api});});
+test('gigs malformed response produces a readable error rather than a crash',async()=>{api.mockResolvedValue({gigs:null});render(<MemoryRouter future={{v7_startTransition:true,v7_relativeSplatPath:true}}><Gigs/></MemoryRouter>);expect(await screen.findByRole('alert')).toHaveTextContent('incomplete page data');expect(screen.getByRole('button',{name:'Try again'})).toBeInTheDocument();});
+test('empty bookings remain a valid page state',async()=>{api.mockResolvedValue({bookings:[]});render(<Bookings/>);expect(await screen.findByText('No bookings yet.')).toBeInTheDocument();expect(screen.queryByRole('alert')).not.toBeInTheDocument();});
+test('bookings recover from malformed response through retry',async()=>{api.mockResolvedValueOnce({bookings:[null]}).mockResolvedValueOnce({bookings:[]});const user=userEvent.setup();render(<Bookings/>);expect(await screen.findByRole('alert')).toHaveTextContent('incomplete page data');await user.click(screen.getByRole('button',{name:'Try again'}));expect(await screen.findByText('No bookings yet.')).toBeInTheDocument();expect(api).toHaveBeenCalledTimes(2);});
