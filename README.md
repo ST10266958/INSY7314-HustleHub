@@ -4,190 +4,294 @@ Secure freelance marketplace platform developed for INSY7214 (Secure Freelance M
 
 ## Project Overview
 
-HustleHub+ is a secure freelance marketplace platform that allows **Freelancers** to advertise services and **Clients** to browse and book those services. The system will support creation of transaction records based on bookings (payments are simulated), income tracking for Freelancers, and estimated tax calculations.
+HustleHub+ is a full-stack MERN application where **Freelancers** list services (gigs) and **Clients** browse and book them. Payments are simulated: every booking is confirmed immediately and creates a transaction record linked to both the client and the freelancer. The system tracks each freelancer's income from their bookings.
 
-The platform is being built with security treated as a core requirement rather than an afterthought, since it will process sensitive information including user credentials, transactional records, and income-related data.
+Security is treated as a core requirement. The platform handles user credentials and transaction records, so authentication, authorisation, input validation, rate limiting and security headers are applied across both the API and the frontend.
 
 ### Intended Users
 
 | Role | Description |
 |---|---|
-| **Client** | Browses and books services offered by Freelancers |
-| **Freelancer** | Advertises services (gigs), manages bookings, tracks income and estimated tax |
-| **Admin** | System administration and oversight |
-
-Part 1 establishes the foundation these roles will sit on top of: secure registration, login, and token-based identification. Role-based access control itself (restricting specific endpoints per role) is scoped for a later part of the project.
+| **Client** | Browses gigs, books them, and views their own bookings |
+| **Freelancer** | Creates and manages their own gigs, views bookings made against them, and tracks income |
+| **Admin** | Role is defined in the system but cannot be self-registered. No admin-only endpoints exist yet. |
 
 ## Development Approach
 
-This project follows an incremental development approach across three parts:
+The project is built incrementally across three parts:
 
-- **Part 1 — Secure backend foundations** *(current)*
-- Part 2 — Full-stack application development
-- Part 3 — DevSecOps, monitoring, and finalisation
+- **Part 1 — Secure backend foundations** *(complete)*: Express API, HTTPS, registration, login, bcrypt hashing, JWT, validation
+- **Part 2 — Secure stack** *(current)*: MongoDB, gig management, bookings, transactions, income tracking, role-based access control, React frontend, security headers and CSP, Newman and frontend testing
+- Part 3 — DevSecOps, monitoring and finalisation
+
+## Features
+
+- **Authentication:** register as a client or freelancer, log in, and receive a JWT
+- **Gig management:** freelancers create, update, activate/deactivate and delete their own gigs. Anyone can browse active gigs.
+- **Bookings:** clients book a gig and get a simulated confirmation. Every booking creates a transaction record associated with the client and the freelancer.
+- **Income tracking:** freelancers see their total income and number of completed bookings
+- **Role-based access control:** each endpoint is restricted by role, and users can only modify or delete resources they own
+- **React frontend:** public gig browsing, registration and login, client booking flow and booking history, and a freelancer dashboard (own gigs, bookings, income)
+
+## Architecture
+
+```
+React frontend (Vite, http://127.0.0.1:5173)
+        │   HTTPS, Authorization: Bearer <JWT>
+        ▼
+Express API (https://localhost:5000)
+   Helmet + CSP → CORS → JSON body limit → rate limiter → input validation
+   → JWT authentication → role check (RBAC) → controller (ownership check)
+        │
+        ▼
+MongoDB via Mongoose: users, gigs, bookings, transactions
+```
+
+### Architecture diagram
+
+![HustleHub+ Part 2 architecture](backend/docs/hustlehub_part2_architecture.png)
 
 ## Technology Stack
 
-### Frontend
-- React
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, React Router 6, Vite |
+| Backend | Node.js, Express 5 |
+| Database | MongoDB (Atlas), Mongoose |
+| Security | JWT, bcrypt, express-validator, Helmet (CSP), express-rate-limit, CORS, HTTPS |
+| Testing | Postman and Newman (backend), Jest and React Testing Library (frontend) |
+| Planned (Part 3) | Docker, GitHub Actions, automated security scanning |
 
-### Backend
-- Node.js
-- Express.js
-
-### Database
-- MongoDB *(Part 1 uses in-memory/file-based user storage; MongoDB integration is planned for a later part)*
-
-### Security
-- JWT (JSON Web Tokens)
-- bcrypt password hashing
-- Input validation (express-validator)
-- HTTPS (locally configured SSL certificate)
-- Rate limiting on authentication routes
-- Role-based access control *(foundation in place, enforcement expands in later parts)*
-
-### DevOps
-- Docker
-- GitHub Actions
-- Automated testing
-- Security scanning
-
-*(The DevOps and role-enforcement items above are part of the overall project scope and will be implemented in later parts, not Part 1.)*
-
-## Backend Structure
+## Project Structure
 
 ```
 backend/
-└── src/
-    ├── app.js                       — Express app setup (middleware, routes)
-    ├── server.js                    — HTTPS server entry point
-    ├── config/
-    │   ├── env.js                   — loads & validates required environment variables
-    │   ├── httpsConfig.js           — loads the local SSL certificate/key
-    │   └── logger.js                — Winston logging configuration
-    ├── constants/
-    │   └── roles.js                 — CLIENT / FREELANCER / ADMIN role definitions
-    ├── controllers/
-    │   └── authController.js        — registration, login, profile logic
-    ├── middleware/
-    │   ├── authMiddleware.js        — verifies JWT on protected routes
-    │   ├── validationMiddleware.js  — validates & sanitises auth input
-    │   ├── errorHandler.js          — centralised, safe error responses
-    │   └── asyncHandler.js          — wraps async routes for consistent error handling
-    ├── models/
-    │   └── userModel.js             — user data (in-memory/file storage for Part 1)
-    ├── routes/
-    │   └── authRoutes.js            — /api/auth/* endpoint definitions
-    └── utils/
-        ├── AppError.js              — custom error class for controlled error responses
-        ├── jwt.js                   — token signing & verification helpers
-        └── password.js              — bcrypt hashing & comparison helpers
+├── src/
+│   ├── app.js                    Express app: security middleware, routes
+│   ├── server.js                 Connects to MongoDB, then starts the HTTPS server
+│   ├── config/                   env.js, db.js, httpsConfig.js, logger.js
+│   ├── constants/                roles.js, bookingStatus.js
+│   ├── controllers/              auth, gig, booking, income
+│   ├── middleware/               authMiddleware (JWT), rbacMiddleware (roles),
+│   │                             validationMiddleware, errorHandler, asyncHandler
+│   ├── models/                   User, Gig, Booking, Transaction (Mongoose)
+│   ├── routes/                   authRoutes, gigRoutes, bookingRoutes, incomeRoutes
+│   └── utils/                    AppError, jwt, password
+├── postman/                      Postman collections and Newman output
+├── docs/                         Testing documentation, references, diagram
+└── screenshots/                  Test evidence
+
+frontend/
+├── src/
+│   ├── App.jsx, main.jsx         App shell and routes
+│   ├── api.js, config.js         API client and API URL
+│   ├── auth.jsx, components.jsx  Auth context, route guards, shared components
+│   ├── pages/                    AuthPage, Gigs, GigDetail, Dashboard, Bookings
+│   └── test/                     Test setup and CSP tests
+├── csp.js, vite.config.js        Content Security Policy headers and Vite config
+└── docs/                         Frontend testing and CSP documentation, evidence
 ```
 
-This separates concerns cleanly: routes define *what* endpoints exist, controllers define *what happens* when they're called, middleware handles cross-cutting checks (validation, auth, errors) before a request reaches business logic, and models represent the data itself.
+## API Endpoints
 
-## API Endpoints (Part 1)
+Base URL: `https://localhost:5000`. All protected routes need `Authorization: Bearer <token>`.
 
-| Method | Endpoint | Description | Auth required |
+| Method | Endpoint | Access | Description |
 |---|---|---|---|
-| GET | `/health` | Basic health check | No |
-| POST | `/api/auth/register` | Register a new user | No |
-| POST | `/api/auth/login` | Log in and receive a JWT | No |
-| GET | `/api/auth/profile` | Get the logged-in user's profile | Yes (JWT) |
+| GET | `/health` | Public | Health check |
+| POST | `/api/auth/register` | Public | Register as a client or freelancer |
+| POST | `/api/auth/login` | Public | Log in and receive a JWT |
+| GET | `/api/auth/profile` | Any logged-in user | Current user's profile |
+| GET | `/api/gigs` | Public | List active gigs |
+| GET | `/api/gigs/:id` | Public | Get one gig |
+| GET | `/api/gigs/mine` | Freelancer | List your own gigs |
+| POST | `/api/gigs` | Freelancer | Create a gig |
+| PUT | `/api/gigs/:id` | Freelancer (owner) | Update a gig |
+| DELETE | `/api/gigs/:id` | Freelancer (owner) | Delete a gig |
+| POST | `/api/bookings` | Client | Book a gig; also creates a transaction |
+| GET | `/api/bookings/client` | Client | Your bookings as a client |
+| GET | `/api/bookings/freelancer` | Freelancer | Bookings made against your gigs |
+| GET | `/api/income` | Freelancer | Your total income and completed bookings |
 
-## Security Decisions
+## Security Measures
 
-### Password Hashing
+### Password hashing
+Passwords are hashed with bcrypt (12 salt rounds by default) before storage and are never stored or logged in plain text. Registration enforces 8 to 128 characters with at least one lowercase letter, one uppercase letter and one number.
 
-Passwords are never stored in plain text. On registration, passwords are hashed using **bcrypt** before being saved. Bcrypt is a deliberately slow, salted hashing algorithm — the salt means two users with the same password get different hashes, and the slowness makes brute-force and rainbow-table attacks impractical even if the stored data were ever exposed. On login, the submitted password is compared against the stored hash using bcrypt's own comparison function — the plain-text password itself is never stored or logged at any point.
+### JWT authentication
+Login returns a signed JWT with an expiry (1 hour by default). Every protected route passes through `authMiddleware`, which verifies the signature and expiry. Missing, malformed, wrongly signed and expired tokens are all rejected with `401`, and none of the messages reveal how the token is built.
 
-### Token-Based Authentication (JWT)
+### Role-based access control and ownership
+`rbacMiddleware` restricts each route to specific roles and runs before the controller. A role mismatch returns `403`.
 
-After a successful login, the API issues a **JSON Web Token** signed with a secret key. This token is returned to the client and must be included as a `Bearer` token in the `Authorization` header on subsequent requests to protected routes (such as `/api/auth/profile`). The `authMiddleware` verifies the token's signature and expiry on every protected request before allowing it through — an invalid, expired, or missing token is rejected with a `401 Unauthorized` response. This means the server doesn't need to keep session state in memory; authentication is stateless and scales naturally as the system grows.
+| Action | Client | Freelancer | Not logged in |
+|---|---|---|---|
+| Browse gigs | Yes | Yes | Yes |
+| Create, update, delete gigs | No (403) | Own gigs only | No (401) |
+| Create a booking | Yes | No (403) | No (401) |
+| View own bookings | Client view | Freelancer view | No (401) |
+| View income | No (403) | Yes | No (401) |
 
-### Input Validation
+Ownership is enforced in the controller. Editing or deleting a gig you do not own returns `404 Gig not found`, the same response as a gig that does not exist, so error messages cannot be used to discover which gig ids belong to other users. Registration only accepts the `client` and `freelancer` roles, so a user cannot create an admin account.
 
-All incoming data on the registration and login endpoints is validated before it reaches any business logic, using `express-validator`. This includes checking email format and enforcing password strength requirements on registration. Invalid or malformed input is rejected immediately with a `400 Bad Request` response, before it gets anywhere near the user store — this stops malformed or malicious input from being processed at all, rather than relying on something further down the chain to catch it.
+### Input validation and sanitisation
+All request bodies are validated with express-validator before reaching any controller: email format (normalised), password strength, gig field types and length limits, price as a number, `isActive` as a boolean, and booking `gigId` as a valid MongoDB id. Values must be the expected type, so object payloads such as `{"$ne": null}` are rejected with `400` before any database query runs. JSON bodies are limited to 10 KB. On the frontend, React escapes all rendered text and the UI never injects user-supplied HTML.
 
-### HTTPS
+### Rate limiting
+Limits are applied per IP address.
 
-The API is served over **HTTPS** using a locally generated SSL certificate. All traffic between client and server — including login credentials and JWTs — is encrypted in transit. Without HTTPS, credentials and tokens sent over plain HTTP could be intercepted by anyone on the same network (a man-in-the-middle attack), which is unacceptable for a system handling authentication and, eventually, financial data.
+| Endpoints | Limit |
+|---|---|
+| `POST /api/auth/register`, `POST /api/auth/login` | 20 requests per 15 minutes |
+| `POST /api/bookings` | 30 requests per 15 minutes |
 
-### Controlled Error Handling
+Exceeding a limit returns `429` with a clear message.
 
-Errors are caught centrally by `errorHandler.js` and returned as clean, generic JSON responses (e.g. `{ "success": false, "message": "Invalid email or password" }`). Internal details — stack traces, file paths, database errors, configuration values — are never exposed to the client. As one specific example: login failures return the *same* generic message and status code whether the email doesn't exist or the password is wrong, which prevents an attacker from using the login endpoint to figure out which emails are registered on the system.
+### Security headers and Content Security Policy
+The API uses Helmet with an explicit Content Security Policy (`default-src 'self'`, `script-src 'self'`, `object-src 'none'`, `frame-ancestors 'none'`, and images limited to self and data URLs). The frontend sends its own CSP headers from the Vite dev and preview servers, with a strict production-preview policy. The headers are not part of the static build, so a production host must send them itself. See [`frontend/docs/frontend-csp.md`](frontend/docs/frontend-csp.md).
+
+### HTTPS and CORS
+The API runs over HTTPS with a locally generated certificate, so credentials and tokens are encrypted in transit. CORS only allows the configured `CLIENT_ORIGIN`.
+
+### Safe error handling
+Errors go through a central handler that returns clean JSON messages. Stack traces, file paths, database errors and configuration values are never sent to the client. Login failures return the same message whether the email or the password was wrong. The frontend maps API errors to readable messages and never shows raw responses.
+
+### Frontend session handling
+The JWT is held in React memory only, never in localStorage or sessionStorage, so refreshing the page ends the session. Route guards redirect anonymous and wrong-role users, but they exist for usability only. The real enforcement is on the server.
 
 ## Getting Started
 
-Each team member needs their own local `.env` file and SSL certificate — these are intentionally excluded from the repository via `.gitignore` so no secrets are ever committed.
+Requirements: Node.js 20.19+ or 22.12+, OpenSSL, and a MongoDB database (a free MongoDB Atlas cluster works).
+
+Each team member needs their own `.env` file and SSL certificate. These are excluded from the repository by `.gitignore` so no secrets are committed.
+
+### 1. Clone
 
 ```bash
 git clone https://github.com/ST10266958/INSY7314-HustleHub.git
 cd INSY7314-HustleHub
-git checkout <your-branch>
+```
+
+### 2. Backend
+
+```bash
 cd backend
 npm install
 ```
 
-**Create your local environment file:**
+Create `backend/.env` (copy `.env.example` and add the missing values):
 
-```bash
-cp .env.example .env
-```
+| Variable | Required | Description |
+|---|---|---|
+| `MONGODB_URI` | Yes | MongoDB connection string, e.g. `mongodb+srv://<user>:<password>@<cluster>/hustlehub?retryWrites=true&w=majority` |
+| `JWT_SECRET` | Yes | Any string for local development |
+| `JWT_EXPIRES_IN` | No | Token lifetime, default `1h` |
+| `BCRYPT_SALT_ROUNDS` | No | Default `12` |
+| `PORT` | No | Default `5000` |
+| `CLIENT_ORIGIN` | Yes | Frontend origin allowed by CORS. Set it to `http://127.0.0.1:5173`, the address Vite serves |
+| `SSL_KEY_PATH`, `SSL_CERT_PATH` | No | Default `certificates/privatekey.pem` and `certificates/certificate.pem` |
 
-Fill in a value for `JWT_SECRET` (any string works for local development — this is never deployed or submitted).
+If you use Atlas, create a database user and allow your IP address under Network Access, otherwise the server cannot connect and will not start.
 
-**Generate a local SSL certificate:**
+Generate a local SSL certificate:
 
 ```bash
 mkdir certificates
 openssl req -x509 -newkey rsa:2048 -keyout certificates/privatekey.pem -out certificates/certificate.pem -days 365 -nodes -subj "/CN=localhost"
 ```
 
-**Run the server:**
+Start the API:
 
 ```bash
 npm run dev
 ```
 
-Visit `https://localhost:5000/health` to confirm it's running (your browser will warn about the self-signed certificate — this is expected for local development, proceed past it).
+You should see "Connected to MongoDB" followed by the HTTPS startup message. Open `https://localhost:5000/health` once and accept the browser's self-signed certificate warning. The frontend cannot reach the API until the certificate is trusted.
+
+### 3. Frontend
+
+In a second terminal:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+Open **http://127.0.0.1:5173**, the address Vite prints in the terminal. It must match `CLIENT_ORIGIN` in `backend/.env`. The API URL defaults to `https://localhost:5000/api`. To change it, copy `frontend/.env.example` to `frontend/.env`, edit `VITE_API_URL`, and restart Vite.
+
+If the app shows "Cannot reach the API", check that the backend is running, that its certificate is trusted, and that `CLIENT_ORIGIN` matches the address in your browser exactly (`localhost` and `127.0.0.1` count as different origins).
 
 ## Testing
 
-All Part 1 endpoints were tested using Postman. The full collection — covering successful registration and login, as well as invalid, missing, duplicate, and unauthorised scenarios — is included at [`backend/postman/HustleHub-Part1.postman_collection.json`](backend/postman/HustleHub-Part1.postman_collection.json).
+### Backend: Postman and Newman
 
-Full test case documentation, including expected vs. actual results and notes on the security-specific tests, is available at [`backend/docs/part1-testing.md`](backend/docs/part1-testing.md).
+The collection `backend/postman/HustleHub-Part2.postman_collection.json` has 55 requests covering registration and login, gig management as owner, wrong-owner and wrong-role attempts, input validation, bookings and transactions, booking and income views, missing/invalid/expired tokens, and rate limiting.
 
-## Demonstration Video
+To run it with Newman (with the API running):
 
-A video demonstrating the API running, successful registration, and login with token generation is available here: https://youtu.be/7Ul6SDaJ4iQ
+```bash
+npm install -g newman
+cd backend
+newman run postman/HustleHub-Part2.postman_collection.json --insecure
+```
+
+`--insecure` is needed because the API uses a self-signed certificate locally. The collection variable `jwtSecret` must match the backend's `JWT_SECRET` (default `secret`), because it is used to sign the expired-token test. Restart the backend before each run so the rate limit counters start at zero.
+
+**Recorded result:** Newman ran 82 requests (the rate limiting test sends a burst of extra booking requests) and checked 115 assertions. 113 passed and 2 failed. The two failing assertions are recorded in [`backend/docs/part2-testing.md`](backend/docs/part2-testing.md).
+
+Evidence: [`backend/postman/newman-output.txt`](backend/postman/newman-output.txt), the screenshots in [`backend/screenshots/`](backend/screenshots/), and the full write-up in [`backend/docs/part2-testing.md`](backend/docs/part2-testing.md).
+
+### Frontend: Jest and React Testing Library
+
+```bash
+cd frontend
+npm test                 # run the tests
+npm run test:coverage    # with coverage
+npm run build            # production build
+```
+
+36 tests across six suites pass. They cover component rendering, user interaction (login, registration, booking, gig create/edit/delete), route protection, the API client's error handling, and CSP regression checks. API responses are mocked in these tests, so they do not prove a live backend integration. Details and evidence are in [`frontend/docs/part2-frontend-testing.md`](frontend/docs/part2-frontend-testing.md) and `frontend/docs/evidence/`.
+
+### Part 1 testing
+
+The Part 1 collection is at [`backend/postman/HustleHub-Part1.postman_collection.json`](backend/postman/HustleHub-Part1.postman_collection.json), with documentation in [`backend/docs/part1-testing.md`](backend/docs/part1-testing.md).
+
+## Limitations
+
+- There is no standalone transaction history endpoint. A transaction is returned in the response when a booking is created.
+- Estimated tax calculations and admin-only features are not implemented in Part 2.
+- The frontend session is lost on page refresh by design (see Frontend session handling).
+
+## Demonstration Videos
+
+- **Part 1:** https://youtu.be/7Ul6SDaJ4iQ
+- **Part 2:** *(link to be added)*
 
 ## References
 
-A full reference list covering the technologies, libraries, and security guidance used in this build is available at [`backend/docs/references.md`](backend/docs/references.md)
-
-### Architecture Diagram
-
-See below for a visual overview of how a request flows through the system — from the client, over HTTPS, through the security middleware, into the auth controller, and down to the data store.
-
-![HustleHub+ architecture](backend/docs/hustlehub_mern_architecture.png)
+A full reference list covering the technologies, libraries and security guidance used is available at [`backend/docs/references.md`](backend/docs/references.md).
 
 ## Team
 
-| Member | Role |
-|---|---|
-| Andisa | Team Lead / Backend & Integration |
-| Mel | Security & Authentication |
-| Gia | Testing & Documentation |
+| Member | Part 1 | Part 2 |
+|---|---|---|
+| Andisa | Team Lead, backend foundation and integration | Gig, booking, transaction and income backend, RBAC, security headers, rate limiting, integration |
+| Mel | Security and authentication | React frontend and frontend testing |
+| Gia | Testing and documentation | Backend security testing, Postman and Newman |
 
 ## Project Status
 
 **Part 1 — Secure Backend Foundations: Complete**
 
-- ✅ Express API with modular route/controller/middleware structure
-- ✅ HTTPS configured and running locally
-- ✅ Registration & login with bcrypt password hashing
-- ✅ JWT issued on login, verified on protected routes
-- ✅ Input validation on all auth endpoints
-- ✅ Centralised, safe error handling
-- ✅ Postman collection and test documentation
+**Part 2 — Secure Stack: In progress**
+
+- ✅ MongoDB integration with Mongoose models for users, gigs, bookings and transactions
+- ✅ Gig management with ownership enforcement
+- ✅ Bookings that create transaction records, and income tracking
+- ✅ Role-based access control on all protected routes
+- ✅ Input validation, rate limiting, Helmet and Content Security Policy
+- ✅ React frontend (browse, register, login, booking, freelancer dashboard)
+- ✅ Postman collection and Newman evidence
+- ✅ Frontend tests
+- ⬜ Part 2 demonstration video

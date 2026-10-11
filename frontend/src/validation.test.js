@@ -1,0 +1,18 @@
+import {validateAuth,validateGig,isMongoId,readCollection,readIncome,readGig} from './validation';
+const auth={email:' person@example.test ',password:'ValidPassword1',role:'client'};
+const gig={title:' Service ',description:' Useful service ',price:'12.50',category:' Design '};
+test('auth trims email but preserves password exactly',()=>{const result=validateAuth({...auth,password:' Password1 '},{register:true});expect(result.errors).toEqual({});expect(result.values.email).toBe('person@example.test');expect(result.values.password).toBe(' Password1 ');});
+test.each(['','   ','not-an-email','person@','a@b.test '+ 'x'.repeat(254)])('rejects invalid email %s',email=>{expect(validateAuth({...auth,email}).errors.email).toBeTruthy();});
+test.each(['','   ','x'.repeat(129)])('rejects missing/oversized login password',password=>{expect(validateAuth({...auth,password}).errors.password).toBeTruthy();});
+test('login accepts legacy password without imposing registration strength rules',()=>{expect(validateAuth({...auth,password:'legacy'}).errors).toEqual({});});
+test.each(['short','lowercase123','UPPERCASE123','NoNumbersHere'])('registration enforces password rules',password=>{expect(validateAuth({...auth,password},{register:true}).errors.password).toBeTruthy();});
+test('registration rejects admin self-registration',()=>{expect(validateAuth({...auth,role:'admin'},{register:true}).errors.role).toBeTruthy();});
+test('gig trims text and serializes money as a number',()=>{expect(validateGig(gig)).toEqual({errors:{},values:{title:'Service',description:'Useful service',price:12.5,category:'Design'}});});
+test.each(['','   ','-1','abc','Infinity','1e3','12.345','90071992547409999'])('rejects invalid price %s',price=>{expect(validateGig({...gig,price}).errors.price).toBeTruthy();});
+test('zero-price gigs remain allowed by the existing API contract',()=>{expect(validateGig({...gig,price:'0'}).errors).toEqual({});});
+test('rejects whitespace-only text and oversized text',()=>{expect(validateGig({...gig,title:'   ',description:'\n  ',category:'x'.repeat(51)}).errors).toEqual(expect.objectContaining({title:expect.any(String),description:expect.any(String),category:expect.any(String)}));expect(validateGig({...gig,title:'x'.repeat(121),description:'x'.repeat(2001)}).errors).toEqual(expect.objectContaining({title:expect.any(String),description:expect.any(String)}));});
+test('accepts exact text limits',()=>{expect(validateGig({...gig,title:'x'.repeat(120),description:'x'.repeat(2000),category:'x'.repeat(50)}).errors).toEqual({});});
+test('validates MongoDB IDs',()=>{expect(isMongoId('507f1f77bcf86cd799439011')).toBe(true);expect(isMongoId('../auth')).toBe(false);expect(isMongoId(undefined)).toBe(false);});
+test('empty collections are valid while malformed API data is rejected',()=>{expect(readCollection({gigs:[]},'gigs')).toEqual([]);expect(()=>readCollection({gigs:null},'gigs')).toThrow('incomplete page data');expect(()=>readCollection({gigs:[null]},'gigs')).toThrow();expect(()=>readCollection({gigs:[{_id:'id',title:'title',description:'text',price:NaN}]},'gigs')).toThrow('invalid gig data');});
+test('validates booking amounts and income summary',()=>{expect(()=>readCollection({bookings:[{_id:'id',status:'confirmed',amount:-1}]},'bookings')).toThrow();expect(()=>readIncome({totalIncome:0,completedBookings:1.5})).toThrow();expect(readIncome({totalIncome:0,completedBookings:0})).toEqual({totalIncome:0,completedBookings:0});});
+test('rejects incomplete service response',()=>{expect(()=>readGig({gig:{_id:'invalid',title:'title',description:'text',price:0}})).toThrow();});

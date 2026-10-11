@@ -12,13 +12,11 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:5173. Vite uses strict port 5173 so it cannot silently change the port and break CORS.
+Open http://127.0.0.1:5173. Vite uses strict port 5173 so it cannot silently change the port and break CORS.
 
 The API defaults to `https://localhost:5000/api`. To override it, copy `.env.example` to `.env` and change `VITE_API_URL`. Never put secrets in Vite variables: they are public client configuration. Restart Vite after changing the environment file.
 
-The backend's `CLIENT_ORIGIN` must match `http://localhost:5173`. Trust the backend's local HTTPS certificate in your browser; do not disable TLS verification. Run the backend separately using its existing instructions.
-
-**Integration prerequisite:** At implementation time, `mel-auth-security` was 21 commits behind `main` and only exposed Part 1 auth routes. The UI targets the Part 2 controllers inspected on `main` at commit `a0b93de8188a137fb977965e72f892a90d1776ca`. Gig/booking/income pages cannot work against the old backend until the existing Part 2 backend is brought into the branch. No merge was performed by this frontend implementation.
+The backend's `CLIENT_ORIGIN` must match `http://127.0.0.1:5173`. Trust the backend's local HTTPS certificate in your browser; do not disable TLS verification. Run the backend separately using its existing instructions.
 
 ## Included pages
 
