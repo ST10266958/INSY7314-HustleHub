@@ -36,7 +36,8 @@ export function readCollection(data,key) {
   const collection=data?.[key];
   if(!Array.isArray(collection) || collection.some(item=>!item || typeof item!=='object' || typeof item._id!=='string' || !item._id)) throw new Error('The API returned incomplete page data. Please try again.');
   if(key==='gigs' && collection.some(item=>typeof item.title!=='string'||typeof item.description!=='string'||typeof item.price!=='number'||!Number.isFinite(item.price)||item.price<0)) throw new Error('The API returned invalid gig data. Please try again.');
-  if(key==='bookings' && collection.some(item=>typeof item.amount!=='number'||!Number.isFinite(item.amount)||item.amount<0||typeof item.status!=='string')) throw new Error('The API returned invalid booking data. Please try again.');
+  if(key==='users' && collection.some(item=>typeof item.email!=='string'||typeof item.role!=='string')) throw new Error('The API returned invalid user data. Please try again.');
+  if((key==='bookings'||key==='transactions') && collection.some(item=>typeof item.amount!=='number'||!Number.isFinite(item.amount)||item.amount<0||typeof item.status!=='string')) throw new Error('The API returned invalid booking data. Please try again.');
   return collection;
 }
 export function readIncome(data) {
