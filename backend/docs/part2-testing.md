@@ -204,6 +204,41 @@ This part covers testing of the new backend endpoints (gig management, bookings,
 
 ![Expired JWT](../screenshots/Expired-JWT.png)
 
+### Admin endpoints
+
+| Test | Input | Expected | Result |
+|---|---|---|---|
+| Admin login | Admin email + password | 200 OK, returns admin token | Pass |
+| GET /api/admin/users with no token | No Authorization header | 401 Unauthorized | Pass |
+| GET /api/admin/users as client | Client token | 403 Forbidden | Pass |
+| GET /api/admin/bookings as freelancer | Freelancer token | 403 Forbidden | Pass |
+| GET /api/admin/users as admin | Admin token | 200 OK, no passwordHash in response | Pass |
+| DELETE /api/admin/gigs/:id as admin | Admin token + test gig id | 200 OK, subsequent GET returns 404 | Pass |
+| POST /api/gigs as admin | Admin token | 403 Forbidden | Pass |
+| DELETE /api/admin/gigs/not-an-id | Admin token | 400 Bad Request | Pass |
+| GET /api/admin/gigs as admin | Admin token | 200 OK | Pass |
+| GET /api/admin/gigs as client | Client token | 403 Forbidden | Pass |
+
+![Admin Login Success](../screenshots/Admin-Login-Success.png)
+
+![Admin Users No Token](../screenshots/Admin-Users-No-Token.png)
+
+![Admin Users Client Forbidden](../screenshots/Admin-Users-Client-Forbidden.png)
+
+![Admin Bookings Freelancer Forbidden](../screenshots/Admin-Bookings-Freelancer-Forbidden.png)
+
+![Admin Users Admin Success](../screenshots/Admin-Users-Admin-Success.png)
+
+![Admin Delete Gig Success](../screenshots/Admin-Delete-Gig-Success.png)
+
+![Admin Create Gig Forbidden](../screenshots/Admin-Create-Gig-Forbidden.png)
+
+![Admin Delete Malformed ID](../screenshots/Admin-Delete-Malformed-ID.png)
+
+![Admin List Gigs Admin](../screenshots/Admin-List-Gigs-Admin.png)
+
+![Admin List Gigs Client Forbidden](../screenshots/Admin-List-Gigs-Client-Forbidden.png)
+
 ### Rate limiting — POST /api/bookings
 
 | Test | Input | Expected | Result |
@@ -239,6 +274,10 @@ The full Newman run was captured in 11 screenshots.
 ![Newman10](../screenshots/Newman10.png)
 
 ![Newman11](../screenshots/Newman11.png)
+
+![Newman12](../screenshots/Newman12.png)
+
+![Newman13](../screenshots/Newman13.png)
 
 ## Security-Specific Notes
 
