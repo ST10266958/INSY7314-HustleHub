@@ -297,7 +297,7 @@ The Part 1 collection is at [`backend/postman/HustleHub-Part1.postman_collection
 ## Demonstration Videos
 
 - **Part 1:** https://youtu.be/7Ul6SDaJ4iQ
-- **Part 2:** *(link to be added)*
+- **Part 2:** https://youtu.be/mLI_OdOGr4M
 
 ## References
 
