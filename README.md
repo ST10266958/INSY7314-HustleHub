@@ -177,8 +177,8 @@ Each team member needs their own `.env` file and SSL certificate. These are excl
 ### 1. Clone
 
 ```bash
-git clone https://github.com/ST10266958/INSY7314-HustleHub.git
-cd INSY7314-HustleHub
+git clone https://github.com/EMKNDW/insy7314-g1-2026-insy7314-2026-poe-st10266958.git
+cd insy7314-g1-2026-insy7314-2026-poe-st10266958
 ```
 
 ### 2. Backend
@@ -243,13 +243,13 @@ npm run create-admin
 
 On macOS or Linux: `ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD='<a strong password>' npm run create-admin`
 
-The password must meet the same rules as registration. Sign in through the React app (you are taken to `/admin`), or use `POST /api/auth/login` to get an admin token for Postman.
+The password must meet the same rules as registration. Sign in through the React app (you are taken to `/admin`), or use `POST /api/auth/login` to get an admin token for Postman. Use a throwaway password, never a real one.
 
 ## Testing
 
 ### Backend: Postman and Newman
 
-The collection `backend/postman/HustleHub-Part2.postman_collection.json` has 55 requests covering registration and login, gig management as owner, wrong-owner and wrong-role attempts, input validation, bookings and transactions, booking and income views, missing/invalid/expired tokens, and rate limiting.
+The collection `backend/postman/HustleHub-Part2.postman_collection.json` has 65 requests covering registration and login, gig management as owner, wrong-owner and wrong-role attempts, input validation, bookings and transactions, booking and income views, missing/invalid/expired tokens, the admin endpoints, and rate limiting.
 
 To run it with Newman (with the API running):
 
@@ -259,9 +259,14 @@ cd backend
 newman run postman/HustleHub-Part2.postman_collection.json --insecure
 ```
 
-`--insecure` is needed because the API uses a self-signed certificate locally. The collection variable `jwtSecret` must match the backend's `JWT_SECRET` (default `secret`), because it is used to sign the expired-token test. Restart the backend before each run so the rate limit counters start at zero.
+`--insecure` is needed because the API uses a self-signed certificate locally. Two collection variables need to match your setup:
 
-**Recorded result:** Newman ran 82 requests (the rate limiting test sends a burst of extra booking requests) and checked 115 assertions. 113 passed and 2 failed. The two failing assertions are recorded in [`backend/docs/part2-testing.md`](backend/docs/part2-testing.md).
+- `jwtSecret` must match the backend's `JWT_SECRET` (default `secret`), because it is used to sign the expired-token test.
+- `adminEmail` and `adminPassword` (default `admin_test@hustlehub.test` and `TestAdmin123*`, a throwaway test account) must belong to a real admin account, because the admin tests log in with them. Create it once with `npm run create-admin` (see step 4 above) using those same values, or change the variables to match an admin you already have.
+
+Restart the backend before each run so the rate limit counters start at zero.
+
+**Recorded result:** Newman ran 93 requests (the rate limiting test sends a burst of extra booking requests) and checked 135 assertions. 133 passed and 2 failed. Both failures are the same known issue, a malformed gig id returning `500` instead of `400` or `404`, and are recorded in [`backend/docs/part2-testing.md`](backend/docs/part2-testing.md).
 
 Evidence: [`backend/postman/newman-output.txt`](backend/postman/newman-output.txt), the screenshots in [`backend/screenshots/`](backend/screenshots/), and the full write-up in [`backend/docs/part2-testing.md`](backend/docs/part2-testing.md).
 
@@ -284,6 +289,8 @@ The Part 1 collection is at [`backend/postman/HustleHub-Part1.postman_collection
 
 - There is no standalone transaction history endpoint. A transaction is returned in the response when a booking is created.
 - Estimated tax calculations are not implemented in Part 2.
+- Known issue from testing: a malformed gig id (for example `GET /api/gigs/abc`) returns `500` instead of `400` or `404`. No internal details are leaked. The admin delete route already validates the id and returns `400`.
+- A gig price of `0` is accepted, although the validation message says the price must be positive.
 - Admin lists show the 200 most recent records, with no paging or search. Removing a gig that already has bookings leaves those bookings without a gig; the dashboard shows them as "Unavailable gig".
 - The frontend session is lost on page refresh by design (see Frontend session handling).
 
@@ -300,9 +307,9 @@ A full reference list covering the technologies, libraries and security guidance
 
 | Member | Part 1 | Part 2 |
 |---|---|---|
-| Andisa | Team Lead, backend foundation and integration | Gig, booking, transaction and income backend, RBAC, security headers, rate limiting, integration |
+| Andisa | Team Lead, backend foundation and integration | Gig, booking, transaction and income backend, RBAC, security headers, rate limiting, admin role and admin dashboard, integration |
 | Mel | Security and authentication | React frontend and frontend testing |
-| Gia | Testing and documentation | Backend security testing, Postman and Newman |
+| Gia | Testing and documentation | Backend security testing, Postman and Newman, admin endpoint tests |
 
 ## Project Status
 
@@ -319,4 +326,4 @@ A full reference list covering the technologies, libraries and security guidance
 - ✅ Admin role, account creation script, oversight endpoints and admin dashboard
 - ✅ Postman collection and Newman evidence
 - ✅ Frontend tests
-- ⬜ Part 2 demonstration video
+- ✅ Part 2 demonstration video

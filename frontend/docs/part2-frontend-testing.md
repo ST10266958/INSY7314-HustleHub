@@ -2,7 +2,7 @@
 
 ## Scope and environment
 
-Executed on 8 October 2026 using Node.js 24.15.0, Jest 29 and React Testing Library. Five suites containing 29 tests passed, with zero failed tests. API responses are mocked: these are frontend/component/integration-with-mocks tests, not live backend or MongoDB tests.
+Original run executed on 8 October 2026 using Node.js 24.15.0, Jest 29 and React Testing Library. Five suites containing 29 tests passed, with zero failed tests. API responses are mocked: these are frontend/component/integration-with-mocks tests, not live backend or MongoDB tests.
 
 Because the Windows sandbox could not consistently access files under the OneDrive clone, the same frontend source was copied into a Strawberry session validation workspace. Dependencies were installed using the committed lockfile with `npm ci --offline`. No backend code, credentials or user data were copied. Execution evidence was copied back into this folder after validation.
 
@@ -13,6 +13,25 @@ Because the Windows sandbox could not consistently access files under the OneDri
 - `npm run build -- --configLoader native`: exit 0, Vite 6.4.4 compiled 40 modules and emitted production assets successfully. The native configuration loader bypasses sandbox-blocked ancestor lookup and is supported by the installed Vite/Node version.
 
 Evidence is in `evidence/frontend-tests.txt`, `evidence/jest-results.json`, `evidence/frontend-build.txt` (initial blocked attempt), and `evidence/frontend-build-native-loader.txt` (successful production build). Coverage was enabled, but this report does not claim complete application coverage or an unverified percentage.
+
+## Update: current suite after the admin dashboard (12 October 2026)
+
+The results above are Mel's original run and are kept as recorded. Since then the frontend validation, CSP and admin dashboard work was merged into `main`. A full run on the current `main` gave 10 suites and 90 tests, all passing, with zero failures. `npm run build` (`vite build`) also succeeded. Evidence: `evidence/frontend-tests-admin-update.txt`. API responses are still mocked in all of these tests.
+
+New admin coverage (6 tests in `AdminDashboard.test.jsx`, 2 in `App.test.jsx`, 1 in `validation.test.js`):
+
+| Tests | Expected | Actual |
+| --- | --- | --- |
+| Admin data loading | All four admin endpoints requested, summary and users shown | Passed |
+| Admin tabs | Switching to Bookings and Transactions shows the right rows | Passed |
+| Gig removal | Separate confirmation required, then the admin DELETE endpoint is called | Passed |
+| Cancelled removal | No DELETE request is made | Passed |
+| Admin API failure | Readable error, no data shown | Passed |
+| Malformed admin data | Rejected with a readable error | Passed |
+| Navigation | Admin sees an Admin link and no client or freelancer links; clients and freelancers do not see it | Passed |
+| Validation | User and transaction data are checked before display | Passed |
+
+The admin dashboard was also checked by hand in the browser against the live backend and MongoDB on 11 October 2026 (users, gigs, bookings and transactions tabs loaded real data). Screenshots of that check are not yet saved in `evidence/`. Wrong-role access to `/admin` is covered by the route guard tests, and server-side enforcement is tested in the Postman and Newman admin tests in `backend/docs/part2-testing.md`.
 
 ## Expected versus actual
 

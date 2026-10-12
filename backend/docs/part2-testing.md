@@ -2,7 +2,7 @@
 
 ## Overview
 
-This part covers testing of the new backend endpoints (gig management, bookings, transactions and income tracking) along with the role-based access control, ownership checks, validation and rate limiting that sit on top of them. Testing was run against the local backend at https://localhost:5000, connected to the MongoDB Atlas database, using a Postman collection that was also run from the terminal with Newman. The collection has 55 requests. Newman ran 82 requests in total, because the rate limiting test sends a burst of extra booking requests, and checked 115 assertions. 113 passed and 2 failed. Both failures are the same bug (malformed gig ids returning a 500), which is covered under Issues Found below. Everything else gave the expected result. Three test accounts were registered at the start of each run (one client and two freelancers, called freelancer A and freelancer B), so that the wrong-owner and wrong-role cases could be tested properly.
+This part covers testing of the new backend endpoints (gig management, bookings, transactions and income tracking) along with the role-based access control, ownership checks, validation and rate limiting that sit on top of them. Testing was run against the local backend at https://localhost:5000, connected to the MongoDB Atlas database, using a Postman collection that was also run from the terminal with Newman. The collection has 65 requests, including the admin endpoint tests. Newman ran 93 requests in total, because the rate limiting test sends a burst of extra booking requests, and checked 135 assertions. 133 passed and 2 failed. Both failures are the same bug (malformed gig ids returning a 500), which is covered under Issues Found below. Everything else gave the expected result. Three test accounts were registered at the start of each run (one client and two freelancers, called freelancer A and freelancer B), so that the wrong-owner and wrong-role cases could be tested properly.
 
 ## Test Cases
 
@@ -251,7 +251,7 @@ The booking limiter is set to 30 requests per 15 minutes. Four booking requests 
 
 ### Newman Run — Terminal Output
 
-The full Newman run was captured in 11 screenshots.
+The full Newman run was captured in 13 screenshots.
 
 ![Newman1](../screenshots/Newman1.png)
 

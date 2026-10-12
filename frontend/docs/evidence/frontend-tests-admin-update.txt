@@ -1,0 +1,117 @@
+(node:242) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+PASS src/pages/AdminDashboard.test.jsx
+  ✓ loads all four admin endpoints and shows summary and users (79 ms)
+  ✓ tabs switch between bookings and transactions (368 ms)
+  ✓ gig removal needs a separate confirmation then calls the admin endpoint (200 ms)
+  ✓ cancelling a removal makes no delete request (199 ms)
+  ✓ API failure shows a readable error and no data (12 ms)
+  ✓ malformed response is rejected (10 ms)
+
+PASS src/pages/AuthPage.test.jsx
+  ✓ login sends correct credentials and navigates client to gigs (286 ms)
+  ✓ shows readable login failure (218 ms)
+  ✓ blocks weak registration password before API request (240 ms)
+  ✓ registration submits freelancer role and navigates to dashboard (290 ms)
+  ✓ disables submit while login is pending (213 ms)
+  ✓ empty login shows field errors and focuses email without calling API (33 ms)
+  ✓ invalid email is rejected before login request (157 ms)
+
+PASS src/pages/Dashboard.test.jsx
+  ✓ loads own gigs bookings and income from supported endpoints (42 ms)
+  ✓ create form sends validated gig data (515 ms)
+  ✓ editing sends own gig update including active state (413 ms)
+  ✓ deletion requires a separate confirmation (138 ms)
+  ✓ empty gig cannot be submitted and title gets focus (56 ms)
+  ✓ whitespace title and negative price are rejected before create (268 ms)
+
+PASS src/pages/GigDetail.test.jsx
+  ✓ client booking displays booking and transaction confirmation (69 ms)
+  ✓ freelancer cannot initiate a booking (7 ms)
+  ✓ anonymous user sees sign-in link instead of booking control (15 ms)
+  ✓ malformed service route never sends a request (9 ms)
+  ✓ incomplete booking confirmation blocks automatic repeat booking (43 ms)
+
+PASS src/App.test.jsx
+  ✓ footer has working navigation and no assessment copy (90 ms)
+  ✓ client footer points to own bookings (18 ms)
+  ✓ freelancer footer points to own dashboard (25 ms)
+  ✓ admin sees an Admin link and no freelancer or client links (38 ms)
+  ✓ clients and freelancers do not see the Admin link (15 ms)
+
+PASS src/pages/PageData.test.jsx
+  ✓ gigs malformed response produces a readable error rather than a crash (39 ms)
+  ✓ empty bookings remain a valid page state (10 ms)
+  ✓ bookings recover from malformed response through retry (33 ms)
+
+PASS src/validation.test.js
+  ✓ auth trims email but preserves password exactly (1 ms)
+  ✓ rejects invalid email 
+  ✓ rejects invalid email    
+  ✓ rejects invalid email not-an-email
+  ✓ rejects invalid email person@ (1 ms)
+  ✓ rejects invalid email a@b.test xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  ✓ rejects missing/oversized login password (1 ms)
+  ✓ rejects missing/oversized login password
+  ✓ rejects missing/oversized login password (1 ms)
+  ✓ login accepts legacy password without imposing registration strength rules (1 ms)
+  ✓ registration enforces password rules
+  ✓ registration enforces password rules (1 ms)
+  ✓ registration enforces password rules
+  ✓ registration enforces password rules
+  ✓ registration rejects admin self-registration
+  ✓ gig trims text and serializes money as a number (1 ms)
+  ✓ rejects invalid price  (2 ms)
+  ✓ rejects invalid price    
+  ✓ rejects invalid price -1
+  ✓ rejects invalid price abc
+  ✓ rejects invalid price Infinity
+  ✓ rejects invalid price 1e3
+  ✓ rejects invalid price 12.345 (1 ms)
+  ✓ rejects invalid price 90071992547409999
+  ✓ zero-price gigs remain allowed by the existing API contract
+  ✓ rejects whitespace-only text and oversized text (1 ms)
+  ✓ accepts exact text limits
+  ✓ validates MongoDB IDs (1 ms)
+  ✓ empty collections are valid while malformed API data is rejected (19 ms)
+  ✓ validates booking amounts and income summary (5 ms)
+  ✓ rejects incomplete service response
+  ✓ readCollection validates users and transactions (1 ms)
+
+PASS src/components.test.jsx
+  ✓ renders gig title, price and detail link (18 ms)
+  ✓ shows empty state without gigs (2 ms)
+  ✓ React escapes untrusted gig content instead of executing markup (10 ms)
+  ✓ redirects anonymous users to login (3 ms)
+  ✓ wrong role cannot see dashboard (3 ms)
+  ✓ freelancer can see own dashboard page (1 ms)
+  ✓ deleted gig does not break booking rendering (4 ms)
+
+PASS src/test/csp.test.js
+  ✓ development allows Vite preamble, CSS HMR, API and exact local WebSockets (2 ms)
+  ✓ production blocks inline scripts/styles and has no development WebSockets (1 ms)
+  ✓ uses only API origin, not its path or query (1 ms)
+  ✓ custom development port is reflected in WebSocket allowlist (2 ms)
+  ✓ rejects unsafe API configuration javascript:alert(1) (7 ms)
+  ✓ rejects unsafe API configuration https://user:password@example.test/api (1 ms)
+  ✓ includes supporting headers and denies attribute scripts (2 ms)
+
+PASS src/api.test.js
+  ✓ attaches bearer token and serializes booking body (1 ms)
+  ✓ public gig requests do not attach a token (1 ms)
+  ✓ handles status 400 without leaking server details (8 ms)
+  ✓ handles status 401 without leaking server details (1 ms)
+  ✓ handles status 403 without leaking server details (1 ms)
+  ✓ handles status 404 without leaking server details
+  ✓ handles status 429 without leaking server details (1 ms)
+  ✓ handles status 500 without leaking server details
+  ✓ network failure gives actionable message (1 ms)
+  ✓ invalid successful response is rejected
+  ✓ login 401 reports invalid credentials rather than expired session (1 ms)
+  ✓ protected-route 401 retains expired-session guidance (1 ms)
+
+Test Suites: 10 passed, 10 total
+Tests:       90 passed, 90 total
+Snapshots:   0 total
+Time:        6.903 s, estimated 8 s
+Ran all test suites.

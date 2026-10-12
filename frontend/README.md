@@ -1,6 +1,6 @@
-# HustleHub+ — Mel's Part 2 frontend
+# HustleHub+ — Part 2 frontend
 
-React + React Router + Vite, with Jest and React Testing Library. This folder contains Mel's work only; no backend files, Postman collections, shared root README, deployment or Part 3 features were changed.
+React + React Router + Vite, with Jest and React Testing Library. The client and freelancer pages were built by Mel. The admin dashboard was added by Andisa. See the [root README](../README.md) for the backend, API endpoints and full setup.
 
 ## Run
 
@@ -24,6 +24,7 @@ The backend's `CLIENT_ORIGIN` must match `http://127.0.0.1:5173`. Trust the back
 - Registration as a client or freelancer, login and logout.
 - Client booking flow with returned booking and transaction references, simulated payment notice, and own booking history.
 - Freelancer dashboard: create, edit, activate/deactivate and delete own gigs with deletion confirmation; own bookings and API income summary.
+- Admin dashboard at `/admin` (admin only): summary cards and tabs for users, gigs, bookings and transactions, plus gig removal with a confirmation step. It uses the admin API endpoints, so the backend must be running and an admin account must exist (`npm run create-admin` in `backend/`). Admins are sent to `/admin` after sign-in.
 - Anonymous and wrong-role route protection; loading, empty and readable error states.
 - Responsive layout, labelled form controls and keyboard focus indicators.
 
@@ -41,11 +42,11 @@ npm run test:coverage
 npm run build
 ```
 
-See `docs/part2-frontend-testing.md` and `docs/evidence/` for the actual recorded results and limitations. Mocked tests are not proof of a live MongoDB/backend integration.
+The current suite is 90 tests across ten suites, all passing, and the production build succeeds. See `docs/part2-frontend-testing.md` and `docs/evidence/` for the recorded results and limitations. Mocked tests are not proof of a live MongoDB/backend integration.
 
 ## Scope boundaries
 
-No fabricated transaction-list endpoint, admin provisioning, tax calculator, real payment gateway, Docker or CI/CD was added. The supplied API offers a booking-associated transaction in the creation response but no standalone transaction history endpoint. Tax and wider admin functionality appear in the overall project requirements, not Mel's assigned Part 2 API contract; confirm these with the team for the appropriate part. Shared README, demonstration video and final university-repository mirroring remain end-of-team tasks.
+No tax calculator, real payment gateway, Docker or CI/CD was added. Users and freelancers have no standalone transaction history page, because the API returns a transaction only when a booking is created. Admin accounts cannot be created from the UI: they are created with the backend `npm run create-admin` script, and the admin pages only read and remove data through the admin API. Admin lists show the 200 most recent records with no paging or search.
 
 ## Frontend Content Security Policy
 
