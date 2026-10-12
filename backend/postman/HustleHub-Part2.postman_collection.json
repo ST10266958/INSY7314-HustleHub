@@ -2,7 +2,7 @@
   "info": {
     "name": "HustleHub-Part2",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Part 2 backend tests: RBAC, ownership, validation, JWT failures and rate limiting. Run against a freshly started server."
+    "description": "Part 2 backend tests: RBAC, ownership, validation, JWT failures, rate limiting, and admin endpoints. Run against a freshly started server."
   },
   "item": [
     {
@@ -1619,7 +1619,287 @@
       ]
     },
     {
-      "name": "8 Rate Limiting",
+      "name": "8 Admin",
+      "item": [
+        {
+          "name": "Admin - Login Success",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Message contains: Login successful.\", function () { pm.expect(pm.response.json().message).to.include(\"Login successful.\"); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set('adminToken', j.data.token);",
+                  "pm.test('Role is admin', function () { pm.expect(j.data.user.role).to.eql('admin'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Users - No Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/users"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401\", function () { pm.response.to.have.status(401); });",
+                  "pm.test(\"Message contains: Authentication required.\", function () { pm.expect(pm.response.json().message).to.include(\"Authentication required.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Users - Client Forbidden",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clientToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Message contains: You do not have permission to perform this action.\", function () { pm.expect(pm.response.json().message).to.include(\"You do not have permission to perform this action.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Bookings - Freelancer Forbidden",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{freelancerAToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/bookings"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Message contains: You do not have permission to perform this action.\", function () { pm.expect(pm.response.json().message).to.include(\"You do not have permission to perform this action.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Users - Admin Success",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test('Response has users array', function () { pm.expect(pm.response.json().data.users).to.be.an('array'); });",
+                  "pm.test('No passwordHash in any user', function () {",
+                  "  const users = pm.response.json().data.users;",
+                  "  users.forEach(u => pm.expect(u).to.not.have.property('passwordHash'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Delete Gig - Success",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/gigs/{{gigId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.sendRequest({",
+                  "  url: pm.variables.replaceIn('{{baseUrl}}/gigs/{{gigId}}'),",
+                  "  method: 'GET'",
+                  "}, function (err, res) {",
+                  "  pm.test('Gig is gone (404 after admin delete)', function () { pm.expect(res.code).to.eql(404); });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Create Gig - Forbidden",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/gigs",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Admin gig attempt\",\n  \"description\": \"Should be rejected.\",\n  \"price\": 50\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Message contains: You do not have permission to perform this action.\", function () { pm.expect(pm.response.json().message).to.include(\"You do not have permission to perform this action.\"); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Delete Gig - Malformed ID",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/gigs/not-an-id"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin List Gigs - Admin Success",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/gigs"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin List Gigs - Client Forbidden",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clientToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/gigs"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 403\", function () { pm.response.to.have.status(403); });",
+                  "pm.test(\"Message contains: You do not have permission to perform this action.\", function () { pm.expect(pm.response.json().message).to.include(\"You do not have permission to perform this action.\"); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "9 Rate Limiting",
       "item": [
         {
           "name": "Booking Burst - Rate Limited",
@@ -1693,6 +1973,14 @@
     {
       "key": "jwtSecret",
       "value": "secret"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin_test@hustlehub.test"
+    },
+    {
+      "key": "adminPassword",
+      "value": "TestAdmin123*"
     }
   ]
 }
