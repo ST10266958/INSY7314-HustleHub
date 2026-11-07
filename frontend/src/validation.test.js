@@ -18,3 +18,13 @@ test('validates booking amounts and income summary',()=>{expect(()=>readCollecti
 test('rejects incomplete service response',()=>{expect(()=>readGig({gig:{_id:'invalid',title:'title',description:'text',price:0}})).toThrow();});
 
 test('readCollection validates users and transactions',()=>{expect(()=>readCollection({users:[{_id:'1',email:'a@b.co',role:'client'}]},'users')).not.toThrow();expect(()=>readCollection({users:[{_id:'1',email:5,role:'client'}]},'users')).toThrow('invalid user data');expect(()=>readCollection({transactions:[{_id:'1',amount:-1,status:'completed'}]},'transactions')).toThrow('invalid booking data');});
+
+test('income tax fields are optional but must be well formed when present',()=>{
+  const tax={taxYear:'2026/27',elapsedFraction:0.5,yearToDateIncome:1,annualisedIncome:2,grossAnnualTax:0,primaryRebate:17820,estimatedAnnualTax:0,estimatedTaxToDate:0,estimatedAfterTaxIncomeToDate:1,effectiveTaxRate:0,bracketBreakdown:[{from:0,to:245100,rate:0.18,taxedAmount:2,tax:0.36},{from:1878600,to:null,rate:0.45,taxedAmount:0,tax:0}]};
+  const months=[{month:'2026-03',label:'Mar 2026',income:0}];
+  expect(readIncome({totalIncome:1,completedBookings:1,taxEstimate:tax,monthlyIncome:months})).toBeTruthy();
+  expect(()=>readIncome({totalIncome:1,completedBookings:1,taxEstimate:{...tax,estimatedTaxToDate:'lots'}})).toThrow(/tax estimate/);
+  expect(()=>readIncome({totalIncome:1,completedBookings:1,taxEstimate:{...tax,bracketBreakdown:[{from:-1}]}})).toThrow();
+  expect(()=>readIncome({totalIncome:1,completedBookings:1,taxEstimate:null})).toThrow();
+  expect(()=>readIncome({totalIncome:1,completedBookings:1,monthlyIncome:[{month:1}]})).toThrow(/monthly/);
+});
