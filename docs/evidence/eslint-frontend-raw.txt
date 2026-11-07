@@ -1,0 +1,21 @@
+
+frontend/src/pages/AuthPage.jsx
+  10:50   warning  Function Call Object Injection Sink  security/detect-object-injection
+  10:83   warning  Generic Object Injection Sink        security/detect-object-injection
+  11:25   warning  Generic Object Injection Sink        security/detect-object-injection
+  11:87   warning  Generic Object Injection Sink        security/detect-object-injection
+  12:107  warning  Generic Object Injection Sink        security/detect-object-injection
+
+frontend/src/pages/Dashboard.jsx
+   9:50  warning  Function Call Object Injection Sink  security/detect-object-injection
+   9:83  warning  Generic Object Injection Sink        security/detect-object-injection
+  10:25  warning  Generic Object Injection Sink        security/detect-object-injection
+  10:91  warning  Generic Object Injection Sink        security/detect-object-injection
+
+frontend/src/validation.js
+  29:12  warning  Unsafe Regular Expression            security/detect-unsafe-regex
+  38:20  warning  Generic Object Injection Sink        security/detect-object-injection
+  49:45  warning  Function Call Object Injection Sink  security/detect-object-injection
+
+✖ 12 problems (0 errors, 12 warnings)
+

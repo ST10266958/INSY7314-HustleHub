@@ -1,0 +1,15 @@
+
+backend/src/config/env.js
+  5:17  warning  Generic Object Injection Sink  security/detect-object-injection
+
+backend/src/config/httpsConfig.js
+  11:6   warning  Found existsSync from package "fs" with non literal argument at index 0    security/detect-non-literal-fs-filename
+  11:33  warning  Found existsSync from package "fs" with non literal argument at index 0    security/detect-non-literal-fs-filename
+  17:8   warning  Found readFileSync from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  18:9   warning  Found readFileSync from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+
+backend/src/config/logger.js
+  9:34  warning  Generic Object Injection Sink  security/detect-object-injection
+
+✖ 6 problems (0 errors, 6 warnings)
+

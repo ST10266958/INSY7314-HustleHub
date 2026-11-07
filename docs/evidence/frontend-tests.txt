@@ -1,0 +1,37 @@
+PASS src/pages/Dashboard.test.jsx
+PASS src/pages/AuthPage.test.jsx
+PASS src/pages/AdminDashboard.test.jsx
+PASS src/pages/GigDetail.test.jsx
+PASS src/pages/IncomeInsights.test.jsx
+PASS src/App.test.jsx
+PASS src/pages/PageData.test.jsx
+PASS src/test/csp.test.js
+PASS src/api.test.js
+PASS src/components.test.jsx
+PASS src/validation.test.js
+---------------------|---------|----------|---------|---------|-------------------
+File                 | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+---------------------|---------|----------|---------|---------|-------------------
+All files            |   84.78 |    85.15 |   84.48 |   90.52 |                   
+ src                 |   83.94 |    91.04 |   82.35 |   83.72 |                   
+  App.jsx            |     100 |      100 |     100 |     100 |                   
+  api.js             |    87.5 |    88.88 |   66.66 |     100 | 6,11              
+  auth.jsx           |       0 |        0 |       0 |       0 | 3-20              
+  components.jsx     |     100 |       92 |     100 |     100 | 17                
+  config.js          |       0 |        0 |     100 |       0 | 1                 
+  validation.js      |     100 |    98.38 |     100 |     100 | 3,69              
+ src/pages           |   85.13 |    80.54 |   85.36 |   96.15 |                   
+  AdminDashboard.jsx |   81.66 |    78.94 |   90.47 |   94.73 | 56,66             
+  AuthPage.jsx       |   97.22 |    86.48 |     100 |     100 | 7,14,18           
+  Bookings.jsx       |     100 |    83.33 |     100 |     100 | 7                 
+  Dashboard.jsx      |   81.44 |    85.93 |   76.19 |   81.81 | 16,18             
+  GigDetail.jsx      |   73.58 |    77.96 |   85.71 |     100 | 8-9,11            
+  Gigs.jsx           |   83.33 |    58.33 |      60 |     100 | 7-9               
+  IncomeInsights.jsx |     100 |       75 |     100 |     100 | 26-71,142         
+---------------------|---------|----------|---------|---------|-------------------
+
+Test Suites: 11 passed, 11 total
+Tests:       97 passed, 97 total
+Snapshots:   0 total
+Time:        5.908 s, estimated 8 s
+Ran all test suites.
