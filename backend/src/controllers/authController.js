@@ -3,7 +3,8 @@ const { hashPassword, comparePassword } = require('../utils/password');
 const { signToken } = require('../utils/jwt');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../middleware/asyncHandler');
-const logger = require('../config/logger');
+const { audit } = require('../utils/audit');
+const { AUDIT_EVENTS } = require('../constants/auditEvents');
 const { ROLES } = require('../constants/roles');
 
 const register = asyncHandler(async (req, res) => {
@@ -11,14 +12,13 @@ const register = asyncHandler(async (req, res) => {
 
   const existing = await userStore.findByEmail(email);
   if (existing) {
-    
     throw new AppError('An account with this email already exists.', 409);
   }
 
   const passwordHash = await hashPassword(password);
   const user = await userStore.create({ email, passwordHash, role });
 
-  logger.info('User registered', { userId: user.id, role: user.role });
+  audit(AUDIT_EVENTS.USER_REGISTERED, { req, userId: user.id, email: user.email, details: { role: user.role } });
 
   const token = signToken(user);
   res.status(201).json({
@@ -33,19 +33,29 @@ const login = asyncHandler(async (req, res) => {
 
   const user = await userStore.findByEmail(email);
 
-  
   if (!user) {
-    logger.warn('Login failed: unknown email', { email });
+    audit(AUDIT_EVENTS.LOGIN_FAILED, { req, email, outcome: 'failure', details: { reason: 'unknown_email' } });
     throw new AppError('Invalid email or password.', 401);
+  }
+
+  // While locked we do not even check the password, so an attacker cannot keep guessing.
+  if (userStore.isLocked(user)) {
+    audit(AUDIT_EVENTS.LOGIN_BLOCKED, { req, userId: user.id, email, outcome: 'denied', details: { reason: 'account_locked' } });
+    throw new AppError('Too many failed login attempts. Please try again later.', 429);
   }
 
   const passwordMatches = await comparePassword(password, user.passwordHash);
   if (!passwordMatches) {
-    logger.warn('Login failed: bad password', { userId: user.id });
+    const { locked, attempts } = await userStore.registerFailedLogin(user);
+    audit(AUDIT_EVENTS.LOGIN_FAILED, { req, userId: user.id, email, outcome: 'failure', details: { reason: 'bad_password', attempts } });
+    if (locked) {
+      audit(AUDIT_EVENTS.ACCOUNT_LOCKED, { req, userId: user.id, email, outcome: 'denied', details: { reason: 'too_many_failed_logins' } });
+    }
     throw new AppError('Invalid email or password.', 401);
   }
 
-  logger.info('User logged in', { userId: user.id });
+  await userStore.resetLoginState(user);
+  audit(AUDIT_EVENTS.LOGIN_SUCCESS, { req, userId: user.id, email });
 
   const token = signToken(user);
   res.status(200).json({

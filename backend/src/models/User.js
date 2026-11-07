@@ -19,6 +19,9 @@ const userSchema = new mongoose.Schema(
       enum: Object.values(ROLES),
       required: true,
     },
+    // Account lockout state (see authController.login)
+    failedLoginAttempts: { type: Number, default: 0 },
+    lockUntil: { type: Date },
   },
   { timestamps: true }
 );
