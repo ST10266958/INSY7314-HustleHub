@@ -1,5 +1,5 @@
 const express = require('express');
-const rateLimit = require('express-rate-limit');
+const { createLimiter } = require('../middleware/rateLimiter');
 const { requireAuth } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/rbacMiddleware');
 const { ROLES } = require('../constants/roles');
@@ -12,12 +12,11 @@ const {
 
 const router = express.Router();
 
-const bookingLimiter = rateLimit({
+const bookingLimiter = createLimiter({
+  name: 'booking',
   windowMs: 15 * 60 * 1000,
   max: 30,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { success: false, message: 'Too many booking attempts. Please try again later.' },
+  message: 'Too many booking attempts. Please try again later.',
 });
 
 router.post('/', requireAuth, requireRole(ROLES.CLIENT), bookingLimiter, bookingValidation, createBooking);
