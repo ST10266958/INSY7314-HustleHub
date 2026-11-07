@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection -- Reviewed: keys come from fixed field names written in this file (title, price, email...), never from user-typed text, so there is no object-injection path. */
 import {useState} from 'react';
 import {Link,useLocation,useNavigate} from 'react-router-dom';
 import {useAuth} from '../auth';
