@@ -8,8 +8,10 @@ const TABS=[
   {key:'gigs',label:'Gigs'},
   {key:'bookings',label:'Bookings'},
   {key:'transactions',label:'Transactions'},
+  {key:'security',label:'Security events'},
 ];
 const date=value=>value?new Date(value).toLocaleDateString('en-ZA'):'—';
+const dateTime=value=>value?new Date(value).toLocaleString('en-ZA'):'—';
 
 function Table({head,rows,empty}){
   if(!rows.length)return <p className="empty">{empty}</p>;
@@ -25,6 +27,9 @@ export default function AdminDashboard(){
   const [busy,setBusy]=useState(false);
   const [deleting,setDeleting]=useState(null);
   const [revision,setRevision]=useState(0);
+  const [audit,setAudit]=useState(null);
+  const [auditError,setAuditError]=useState('');
+  const loaded=Boolean(data);
 
   useEffect(()=>{
     const c=new AbortController();
@@ -46,6 +51,18 @@ export default function AdminDashboard(){
     return()=>c.abort();
   },[api,revision]);
 
+  // Security events load only when their tab is open, so a failure here never hides the other tabs.
+  useEffect(()=>{
+    if(tab!=='security'||!loaded)return;
+    const c=new AbortController();
+    setAuditError('');
+    api('/admin/audit-logs?limit=50',{signal:c.signal}).then(a=>{
+      if(c.signal.aborted)return;
+      setAudit(readCollection(a,'logs'));
+    }).catch(e=>{if(e.name!=='AbortError'&&!c.signal.aborted)setAuditError(e.message);});
+    return()=>c.abort();
+  },[api,tab,loaded,revision]);
+
   async function removeGig(){
     if(busy)return;
     if(!deleting||!isMongoId(deleting._id)){setError('This gig has an invalid reference. Refresh the dashboard before removing it.');return;}
@@ -58,12 +75,12 @@ export default function AdminDashboard(){
   }
 
   const revenue=data?data.transactions.reduce((sum,t)=>sum+t.amount,0):0;
-  const counts=data?{users:data.users.length,gigs:data.gigs.length,bookings:data.bookings.length,transactions:data.transactions.length}:{};
+  const counts=data?{users:data.users.length,gigs:data.gigs.length,bookings:data.bookings.length,transactions:data.transactions.length,security:audit?audit.length:undefined}:{};
 
   return <>
     <div className="section-head">
       <div><span className="eyebrow">Platform oversight</span><h1>Admin dashboard</h1></div>
-      <button className="secondary" onClick={()=>{setError('');setNotice('');setData(null);setRevision(r=>r+1);}} disabled={!data&&!error}>Refresh</button>
+      <button className="secondary" onClick={()=>{setError('');setNotice('');setData(null);setAudit(null);setAuditError('');setRevision(r=>r+1);}} disabled={!data&&!error}>Refresh</button>
     </div>
     <ErrorNotice message={error}/>
     {notice&&<p role="status" className="notice">{notice}</p>}
@@ -81,12 +98,18 @@ export default function AdminDashboard(){
       </section>}
       <section className="panel">
         <div className="tabs" role="tablist" aria-label="Admin sections">
-          {TABS.map(t=><button key={t.key} type="button" role="tab" id={`tab-${t.key}`} aria-selected={tab===t.key} aria-controls="admin-panel" className={tab===t.key?'tab active':'tab secondary'} onClick={()=>setTab(t.key)}>{t.label} ({counts[t.key]})</button>)}
+          {TABS.map(t=><button key={t.key} type="button" role="tab" id={`tab-${t.key}`} aria-selected={tab===t.key} aria-controls="admin-panel" className={tab===t.key?'tab active':'tab secondary'} onClick={()=>setTab(t.key)}>{t.label}{counts[t.key]===undefined?'':` (${counts[t.key]})`}</button>)}
         </div>
         <div id="admin-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
           {tab==='users'&&<Table head={['Email','Role','Joined']} empty="No users yet." rows={data.users.map(u=><tr key={u._id}><td>{u.email}</td><td>{u.role}</td><td>{date(u.createdAt)}</td></tr>)}/>}
           {tab==='gigs'&&<Table head={['Service','Freelancer','Price','Status','Action']} empty="No gigs yet." rows={data.gigs.map(g=><tr key={g._id}><td>{g.title}</td><td>{g.freelancer?.email||'Unavailable'}</td><td>{money(g.price)}</td><td>{g.isActive?'Active':'Inactive'}</td><td><button type="button" className="danger" disabled={busy} onClick={()=>{setNotice('');setDeleting(g);}} aria-label={`Remove ${g.title}`}>Remove</button></td></tr>)}/>}
           {tab==='bookings'&&<Table head={['Service','Client','Freelancer','Amount','Status','Date']} empty="No bookings yet." rows={data.bookings.map(b=><tr key={b._id}><td>{b.gig?.title||'Unavailable gig'}</td><td>{b.client?.email||'Unavailable'}</td><td>{b.freelancer?.email||'Unavailable'}</td><td>{money(b.amount)}</td><td>{b.status}</td><td>{date(b.createdAt)}</td></tr>)}/>}
+          {tab==='security'&&<>
+            <ErrorNotice message={auditError}/>
+            <p className="hint">The 50 most recent audit events: login attempts, bookings, transactions, access denials and rate limiting. Application errors are written to the server error log (logs/error.log).</p>
+            {!audit&&!auditError&&<p role="status">Loading security events…</p>}
+            {audit&&<Table head={['Time','Event','Outcome','Email','IP']} empty="No security events recorded yet." rows={audit.map(l=><tr key={l._id}><td>{dateTime(l.createdAt)}</td><td>{l.event||'—'}</td><td>{l.outcome||'—'}</td><td>{l.email||'—'}</td><td>{l.ip||'—'}</td></tr>)}/>}
+          </>}
           {tab==='transactions'&&<Table head={['Client','Freelancer','Amount','Status','Date']} empty="No transactions yet." rows={data.transactions.map(t=><tr key={t._id}><td>{t.client?.email||'Unavailable'}</td><td>{t.freelancer?.email||'Unavailable'}</td><td>{money(t.amount)}</td><td>{t.status}</td><td>{date(t.createdAt)}</td></tr>)}/>}
         </div>
       </section>
