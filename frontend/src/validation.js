@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-object-injection -- Reviewed: keys are literals ('gigs', 'bookings') or entries of the fixed TAX_MONEY_FIELDS list. */
 export const LIMITS = Object.freeze({email:254,password:128,title:120,description:2000,category:50,search:200});
 const text = value => typeof value === 'string' ? value : '';
 export const isMongoId = value => typeof value === 'string' && /^[a-f\d]{24}$/i.test(value);
@@ -25,7 +26,8 @@ export function validateGig(values) {
   else if(description.length>LIMITS.description) errors.description='Description must not exceed 2000 characters.';
   if(category.length>LIMITS.category) errors.category='Category must not exceed 50 characters.';
   if(!rawPrice) errors.price='Price is required.';
-  else if(!/^\d+(?:\.\d{1,2})?$/.test(rawPrice) || !Number.isFinite(Number(rawPrice)) || !Number.isSafeInteger(Math.round(Number(rawPrice)*100))) errors.price='Enter a non-negative price with at most two decimal places.';
+  else if(!/^\d+(?:\.\d{1,2})?$/.test(rawPrice) // eslint-disable-line security/detect-unsafe-regex -- linear pattern: digits, then one optional fixed-length group
+ || !Number.isFinite(Number(rawPrice)) || !Number.isSafeInteger(Math.round(Number(rawPrice)*100))) errors.price='Enter a non-negative price with at most two decimal places.';
   return {errors,values:{title,description,category,price:Number(rawPrice)}};
 }
 export function focusFirstInvalid(form,errors) {
@@ -40,8 +42,26 @@ export function readCollection(data,key) {
   if((key==='bookings'||key==='transactions') && collection.some(item=>typeof item.amount!=='number'||!Number.isFinite(item.amount)||item.amount<0||typeof item.status!=='string')) throw new Error('The API returned invalid booking data. Please try again.');
   return collection;
 }
+const isMoney=value=>typeof value==='number'&&Number.isFinite(value)&&value>=0;
+const TAX_MONEY_FIELDS=['yearToDateIncome','annualisedIncome','grossAnnualTax','primaryRebate','estimatedAnnualTax','estimatedTaxToDate','estimatedAfterTaxIncomeToDate'];
+function readTaxEstimate(tax) {
+  const valid=tax&&typeof tax==='object'&&typeof tax.taxYear==='string'
+    &&TAX_MONEY_FIELDS.every(field=>isMoney(tax[field]))
+    &&typeof tax.effectiveTaxRate==='number'&&Number.isFinite(tax.effectiveTaxRate)
+    &&typeof tax.elapsedFraction==='number'&&Number.isFinite(tax.elapsedFraction)
+    &&Array.isArray(tax.bracketBreakdown)
+    &&tax.bracketBreakdown.every(row=>row&&isMoney(row.from)&&isMoney(row.taxedAmount)&&isMoney(row.tax)&&typeof row.rate==='number'&&(row.to===null||isMoney(row.to)));
+  if(!valid) throw new Error('The API returned invalid tax estimate data. Please try again.');
+}
+function readMonthlyIncome(months) {
+  const valid=Array.isArray(months)&&months.every(m=>m&&typeof m.month==='string'&&typeof m.label==='string'&&isMoney(m.income));
+  if(!valid) throw new Error('The API returned invalid monthly income data. Please try again.');
+}
 export function readIncome(data) {
   if(!data || typeof data.totalIncome!=='number'||!Number.isFinite(data.totalIncome)||data.totalIncome<0||!Number.isSafeInteger(data.completedBookings)||data.completedBookings<0) throw new Error('The API returned invalid income data. Please try again.');
+  // Tax fields are optional so older API responses still work, but if present they must be well formed.
+  if(data.taxEstimate!==undefined) readTaxEstimate(data.taxEstimate);
+  if(data.monthlyIncome!==undefined) readMonthlyIncome(data.monthlyIncome);
   return data;
 }
 export function readGig(data) {
