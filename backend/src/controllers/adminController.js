@@ -1,10 +1,12 @@
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
-const logger = require('../config/logger');
+const { audit } = require('../utils/audit');
+const { AUDIT_EVENTS } = require('../constants/auditEvents');
 const User = require('../models/User');
 const Gig = require('../models/Gig');
 const Booking = require('../models/Booking');
 const Transaction = require('../models/Transaction');
+const AuditLog = require('../models/AuditLog');
 
 const LIST_LIMIT = 200;
 
@@ -50,9 +52,40 @@ const deleteGig = asyncHandler(async (req, res) => {
   }
 
   await gig.deleteOne();
-  logger.info('Gig removed by admin', { adminId: req.user.sub, gigId: req.params.id });
+  audit(AUDIT_EVENTS.ADMIN_GIG_REMOVED, { req, details: { gigId: req.params.id } });
 
   res.status(200).json({ success: true, message: 'Gig removed.' });
 });
 
-module.exports = { listUsers, listGigs, listBookings, listTransactions, deleteGig };
+// Security monitoring: newest audit events first, optionally filtered by event and outcome.
+const listAuditLogs = asyncHandler(async (req, res) => {
+  const filter = {};
+  if (req.query.event) filter.event = req.query.event;
+  if (req.query.outcome) filter.outcome = req.query.outcome;
+  const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
+
+  const logs = await AuditLog.find(filter).sort({ createdAt: -1 }).limit(limit);
+  res.status(200).json({ success: true, data: { logs } });
+});
+
+// Counts of events per type and outcome over the last 24 hours (a quick health view for admins).
+const getAuditSummary = asyncHandler(async (req, res) => {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const rows = await AuditLog.aggregate([
+    { $match: { createdAt: { $gte: since } } },
+    { $group: { _id: { event: '$event', outcome: '$outcome' }, count: { $sum: 1 } } },
+    { $sort: { count: -1 } },
+  ]);
+  const summary = rows.map((r) => ({ event: r._id.event, outcome: r._id.outcome, count: r.count }));
+  res.status(200).json({ success: true, data: { since: since.toISOString(), summary } });
+});
+
+module.exports = {
+  listUsers,
+  listGigs,
+  listBookings,
+  listTransactions,
+  deleteGig,
+  listAuditLogs,
+  getAuditSummary,
+};
