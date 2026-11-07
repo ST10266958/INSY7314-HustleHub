@@ -1,6 +1,8 @@
 const asyncHandler = require('../middleware/asyncHandler');
 const AppError = require('../utils/AppError');
 const Gig = require('../models/Gig');
+const { audit } = require('../utils/audit');
+const { AUDIT_EVENTS } = require('../constants/auditEvents');
 
 async function loadOwnedGig(req) {
   const gig = await Gig.findById(req.params.id);
@@ -24,6 +26,7 @@ const createGig = asyncHandler(async (req, res) => {
     freelancer: req.user.sub,
   });
 
+  audit(AUDIT_EVENTS.GIG_CREATED, { req, details: { gigId: gig._id, price: gig.price } });
   res.status(201).json({ success: true, message: 'Gig created.', data: { gig } });
 });
 
@@ -56,12 +59,14 @@ const updateGig = asyncHandler(async (req, res) => {
   if (isActive !== undefined) gig.isActive = isActive;
 
   await gig.save();
+  audit(AUDIT_EVENTS.GIG_UPDATED, { req, details: { gigId: gig._id } });
   res.status(200).json({ success: true, message: 'Gig updated.', data: { gig } });
 });
 
 const deleteGig = asyncHandler(async (req, res) => {
   const gig = await loadOwnedGig(req);
   await gig.deleteOne();
+  audit(AUDIT_EVENTS.GIG_DELETED, { req, details: { gigId: req.params.id } });
   res.status(200).json({ success: true, message: 'Gig deleted.' });
 });
 

@@ -3,6 +3,8 @@ const AppError = require('../utils/AppError');
 const Gig = require('../models/Gig');
 const Booking = require('../models/Booking');
 const Transaction = require('../models/Transaction');
+const { audit } = require('../utils/audit');
+const { AUDIT_EVENTS } = require('../constants/auditEvents');
 const { BOOKING_STATUSES } = require('../constants/bookingStatus');
 
 const createBooking = asyncHandler(async (req, res) => {
@@ -10,10 +12,12 @@ const createBooking = asyncHandler(async (req, res) => {
 
   const gig = await Gig.findById(gigId);
   if (!gig || !gig.isActive) {
+    audit(AUDIT_EVENTS.BOOKING_REJECTED, { req, outcome: 'failure', details: { reason: 'gig_not_found', gigId } });
     throw new AppError('Gig not found.', 404);
   }
 
   if (gig.freelancer.toString() === req.user.sub) {
+    audit(AUDIT_EVENTS.BOOKING_REJECTED, { req, outcome: 'denied', details: { reason: 'own_gig', gigId } });
     throw new AppError('You cannot book your own gig.', 400);
   }
 
@@ -33,6 +37,15 @@ const createBooking = asyncHandler(async (req, res) => {
     freelancer: gig.freelancer,
     amount: gig.price,
     status: 'completed',
+  });
+
+  audit(AUDIT_EVENTS.BOOKING_CREATED, {
+    req,
+    details: { bookingId: booking._id, gigId: gig._id, freelancerId: gig.freelancer, amount: gig.price },
+  });
+  audit(AUDIT_EVENTS.TRANSACTION_RECORDED, {
+    req,
+    details: { transactionId: transaction._id, bookingId: booking._id, amount: gig.price, status: 'completed' },
   });
 
   res.status(201).json({
