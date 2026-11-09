@@ -1,0 +1,159 @@
+PASS tests/security.test.js
+  security headers and error handling
+    ✓ Helmet and CSP headers are present (23 ms)
+    ✓ unknown routes return a clean 404 (6 ms)
+    ✓ oversized JSON bodies are refused (7 ms)
+    ✓ CORS only allows the configured origin (3 ms)
+
+PASS tests/access.test.js
+  role-based access control
+    ✓ POST /api/gigs is forbidden for a client (27 ms)
+    ✓ POST /api/gigs is forbidden for a admin (6 ms)
+    ✓ GET /api/gigs/mine is forbidden for a client (5 ms)
+    ✓ GET /api/income is forbidden for a client (4 ms)
+    ✓ GET /api/bookings/freelancer is forbidden for a client (6 ms)
+    ✓ GET /api/bookings/client is forbidden for a freelancer (5 ms)
+    ✓ POST /api/bookings is forbidden for a freelancer (4 ms)
+    ✓ GET /api/admin/users is forbidden for a client (4 ms)
+    ✓ GET /api/admin/users is forbidden for a freelancer (6 ms)
+    ✓ GET /api/admin/audit-logs is forbidden for a freelancer (4 ms)
+    ✓ GET /api/gigs/mine needs a token (4 ms)
+    ✓ GET /api/income needs a token (3 ms)
+    ✓ POST /api/bookings needs a token (3 ms)
+    ✓ GET /api/admin/users needs a token (48 ms)
+    ✓ public gig list needs no token (20 ms)
+  ownership and input validation
+    ✓ malformed gig id returns 400, not 500 (26 ms)
+    ✓ a freelancer cannot edit or delete another freelancer's gig (404, same as missing) (40 ms)
+    ✓ invalid gig input is rejected (9 ms)
+    ✓ script tags are stored as text and never executed or reflected as HTML (4 ms)
+  bookings and transactions
+    ✓ a client booking creates a booking and a transaction and logs both (4 ms)
+    ✓ a missing gig is rejected and logged (4 ms)
+    ✓ a non-id gigId is rejected (3 ms)
+  GET /api/income with tax estimate
+    ✓ returns totals, monthly series and a tax estimate (16 ms)
+    ✓ a freelancer with no transactions gets zeros, not an error (3 ms)
+
+PASS tests/auth.test.js
+  POST /api/auth/register
+    ✓ creates a user and never returns the password hash (32 ms)
+    ✓ rejects a weak password (7 ms)
+    ✓ does not let a user self-register as admin (5 ms)
+    ✓ returns 409 for a duplicate email (6 ms)
+    ✓ NoSQL operator objects in the body are rejected before any query runs (5 ms)
+  POST /api/auth/login
+    ✓ succeeds with the right password and logs it (6 ms)
+    ✓ wrong password and unknown email give the same message (18 ms)
+    ✓ locks the account when the failed-attempt limit is reached (6 ms)
+    ✓ a locked account is refused even with the correct password (6 ms)
+    ✓ missing fields return 400 (4 ms)
+  JWT protection
+    ✓ profile needs a token (7 ms)
+    ✓ a token signed with the wrong secret is rejected (11 ms)
+    ✓ an expired token is rejected (10 ms)
+    ✓ a valid token reaches the profile (6 ms)
+
+PASS tests/admin.test.js
+  admin audit trail
+    ✓ admin can list audit events with a filter (11 ms)
+    ✓ filters are whitelisted so query operators cannot reach the database (7 ms)
+    ✓ operator-style query keys are ignored, so the database filter stays empty (3 ms)
+    ✓ summary groups events from the last 24 hours (3 ms)
+
+PASS tests/rateLimit.test.js
+  ✓ the login endpoint is throttled after 20 requests and the throttle is logged (76 ms)
+
+PASS tests/tax.test.js
+  calculateAnnualTax (SARS 2026/27 tables)
+    ✓ income 0 gives tax 0 (1 ms)
+    ✓ income -50 gives tax 0
+    ✓ income 90000 gives tax 0
+    ✓ income 240000 gives tax 25380
+    ✓ income 360000 gives tax 56172 (1 ms)
+    ✓ income 500000 gives tax 98417
+    ✓ top bracket uses 45% above R1,878,600
+    ✓ ignores non-numeric input safely
+  getBracketBreakdown
+    ✓ splits income across brackets and the tax adds up (1 ms)
+  estimateTaxOnYearToDateIncome
+    ✓ annualises year-to-date income and prorates the tax back (1 ms)
+    ✓ zero income gives zero tax and a zero rate
+    ✓ before the tax year starts nothing is annualised (1 ms)
+    ✓ rejects negative income and invalid dates (18 ms)
+    ✓ states its assumptions so the logic can be explained (4 ms)
+  buildMonthlySeries
+    ✓ always returns the 12 months of the tax year, March to February (1 ms)
+    ✓ works with no data (1 ms)
+
+PASS tests/userModel.test.js
+  account lockout (LOCKOUT_MAX_ATTEMPTS=3 in tests)
+    ✓ failed attempts below the limit only increment the counter (1 ms)
+    ✓ reaching the limit sets lockUntil in the future and resets the counter
+    ✓ isLocked is true only while lockUntil is in the future
+    ✓ a successful login clears the lockout state, but only when there is something to clear
+    ✓ toPublic never exposes the hash or lockout fields (1 ms)
+
+PASS tests/audit.test.js
+  ✓ stores the event with request details (1 ms)
+  ✓ a database failure never breaks the request (1 ms)
+  ✓ secrets in log metadata are redacted (3 ms)
+
+--------------------------|---------|----------|---------|---------|-------------------------------
+File                      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s             
+--------------------------|---------|----------|---------|---------|-------------------------------
+All files                 |   88.17 |    78.28 |   79.68 |   89.41 |                               
+ src                      |     100 |      100 |     100 |     100 |                               
+  app.js                  |     100 |      100 |     100 |     100 |                               
+ src/config               |   85.71 |    69.04 |      75 |   88.46 |                               
+  env.js                  |      80 |       75 |     100 |      80 | 7,17                          
+  logger.js               |   88.88 |       50 |   66.66 |   93.75 | 28                            
+ src/constants            |     100 |      100 |     100 |     100 |                               
+  auditEvents.js          |     100 |      100 |     100 |     100 |                               
+  bookingStatus.js        |     100 |      100 |     100 |     100 |                               
+  roles.js                |     100 |      100 |     100 |     100 |                               
+ src/controllers          |   74.15 |    66.03 |   59.09 |   76.47 |                               
+  adminController.js      |   66.66 |     62.5 |    37.5 |   66.66 | 14-18,22-26,30-36,40-45,49-57 
+  authController.js       |   97.72 |     92.3 |     100 |   97.72 | 73                            
+  bookingController.js    |   79.31 |    83.33 |   33.33 |   79.31 | 20-21,59-62,66-69             
+  gigController.js        |   48.93 |    18.75 |   71.42 |   54.76 | 15,39-40,44-48,53-63,68-70    
+  incomeController.js     |     100 |      100 |     100 |     100 |                               
+ src/middleware           |   98.63 |    91.17 |     100 |   98.59 |                               
+  asyncHandler.js         |     100 |      100 |     100 |     100 |                               
+  authMiddleware.js       |     100 |      100 |     100 |     100 |                               
+  errorHandler.js         |   93.33 |    83.33 |     100 |   93.33 | 24                            
+  rateLimiter.js          |     100 |      100 |     100 |     100 |                               
+  rbacMiddleware.js       |     100 |      100 |     100 |     100 |                               
+  validationMiddleware.js |     100 |      100 |     100 |     100 |                               
+ src/models               |      85 |    83.33 |   57.14 |   86.84 |                               
+  AuditLog.js             |     100 |      100 |     100 |     100 |                               
+  Booking.js              |     100 |      100 |     100 |     100 |                               
+  Gig.js                  |     100 |      100 |     100 |     100 |                               
+  Transaction.js          |     100 |      100 |     100 |     100 |                               
+  User.js                 |     100 |      100 |     100 |     100 |                               
+  userModel.js            |   71.42 |    83.33 |   57.14 |   73.68 | 5-17                          
+ src/routes               |     100 |      100 |     100 |     100 |                               
+  adminRoutes.js          |     100 |      100 |     100 |     100 |                               
+  authRoutes.js           |     100 |      100 |     100 |     100 |                               
+  bookingRoutes.js        |     100 |      100 |     100 |     100 |                               
+  gigRoutes.js            |     100 |      100 |     100 |     100 |                               
+  incomeRoutes.js         |     100 |      100 |     100 |     100 |                               
+ src/utils                |     100 |    94.11 |     100 |     100 |                               
+  AppError.js             |     100 |        0 |     100 |     100 | 2                             
+  audit.js                |     100 |    88.88 |     100 |     100 | 8                             
+  jwt.js                  |     100 |      100 |     100 |     100 |                               
+  password.js             |     100 |      100 |     100 |     100 |                               
+  southAfricanTax.js      |     100 |      100 |     100 |     100 |                               
+--------------------------|---------|----------|---------|---------|-------------------------------
+
+=============================== Coverage summary ===============================
+Statements   : 88.17% ( 425/482 )
+Branches     : 78.28% ( 137/175 )
+Functions    : 79.68% ( 51/64 )
+Lines        : 89.41% ( 414/463 )
+================================================================================
+Test Suites: 8 passed, 8 total
+Tests:       71 passed, 71 total
+Snapshots:   0 total
+Time:        3.483 s
+Ran all test suites.

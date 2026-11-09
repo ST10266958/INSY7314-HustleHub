@@ -172,3 +172,21 @@
 49. ST10266958 (2026) *INSY7314-HustleHub: Project Repository and README*. Available at: https://github.com/ST10266958/INSY7314-HustleHub (Accessed: 10 October 2026).  
     Relevance: Project-specific architecture, endpoints, technology stack, implementation scope and testing instructions.
 
+
+## Part 3 references
+
+- South African Revenue Service. Rates of tax for individuals (2026/27 tax year). https://www.sars.gov.za/tax-rates/income-tax/rates-of-tax-for-individuals/
+- GitHub Docs. Workflow syntax for GitHub Actions. https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions
+- GitHub Docs. About code scanning with CodeQL. https://docs.github.com/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning-with-codeql
+- GitHub Docs. Dependabot version updates. https://docs.github.com/code-security/dependabot/dependabot-version-updates
+- ESLint. Getting started with ESLint 9 (flat config). https://eslint.org/docs/latest/use/getting-started
+- eslint-plugin-security. https://github.com/eslint-community/eslint-plugin-security
+- Docker Docs. Compose file reference, multi-stage builds and build best practices. https://docs.docker.com/
+- nginx Docs. Module ngx_http_headers_module. https://nginx.org/en/docs/http/ngx_http_headers_module.html
+- MongoDB Docs. Enable access control and manage users and roles. https://www.mongodb.com/docs/manual/tutorial/enable-authentication/
+- OWASP. Top 10 Web Application Security Risks. https://owasp.org/www-project-top-ten/
+- OWASP. Logging Cheat Sheet. https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
+- OWASP. Authentication Cheat Sheet (account lockout). https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
+- Winston. Logging library for Node.js. https://github.com/winstonjs/winston
+- Jest and Supertest documentation. https://jestjs.io/ and https://github.com/ladjs/supertest
+- Republic of South Africa. Protection of Personal Information Act 4 of 2013.

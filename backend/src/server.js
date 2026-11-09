@@ -58,4 +58,13 @@ const startServer = async () => {
   }
 };
 
+// Anything that escapes normal error handling is logged before the process exits.
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled promise rejection', { message: String(reason?.message || reason), stack: reason?.stack });
+});
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught exception', { message: error.message, stack: error.stack });
+  process.exit(1);
+});
+
 startServer();

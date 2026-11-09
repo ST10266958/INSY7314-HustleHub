@@ -1,11 +1,17 @@
 const logger = require('../config/logger');
 const { nodeEnv } = require('../config/env');
 
-function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-vars
-  const statusCode = err.isOperational && err.statusCode ? err.statusCode : 500;
-  const message = err.isOperational ? err.message : 'An unexpected error occurred. Please try again later.';
+function errorHandler(err, req, res, next) {
+  // Client mistakes raised by body-parser (bad JSON, body too large) are 4xx, not server errors.
+  const isBodyParserError = typeof err.type === 'string' && err.type.startsWith('entity.') && err.status >= 400 && err.status < 500;
+  let statusCode = err.isOperational && err.statusCode ? err.statusCode : 500;
+  let message = err.isOperational ? err.message : 'An unexpected error occurred. Please try again later.';
+  if (isBodyParserError) {
+    statusCode = err.status;
+    message = err.status === 413 ? 'Request body is too large.' : 'Request body could not be parsed.';
+  }
 
-  logger.error('Request error', {
+  logger[statusCode >= 500 ? 'error' : 'warn']('Request error', {
     message: err.message,
     stack: err.stack,
     path: req.originalUrl,

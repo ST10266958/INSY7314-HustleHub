@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+!.env.docker.example
 
 # Logs
 logs/
@@ -36,3 +37,6 @@ tmp/
 temp/
 # Certificates
 backend/certs/
+
+# Generated lint/coverage output (evidence copies live in docs/evidence)
+reports/
