@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1
 # ---- Stage 1: production dependencies only ----
-FROM node:22-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --no-audit --no-fund
 
 # ---- Stage 2: runtime image ----
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 ENV NODE_ENV=production
 # openssl: creates a self-signed certificate on first start. tini: proper signal handling (clean shutdown).
 RUN apk add --no-cache openssl tini
