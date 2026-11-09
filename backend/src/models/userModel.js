@@ -48,6 +48,31 @@ async function resetLoginState(user) {
   await User.updateOne({ _id: user._id }, { $set: { failedLoginAttempts: 0 }, $unset: { lockUntil: 1 } });
 }
 
+/** Stores the hash of a freshly issued reset token. A newer request replaces any older token. */
+async function setResetToken(user, tokenHash, expires) {
+  await User.updateOne(
+    { _id: user._id },
+    { $set: { resetPasswordTokenHash: tokenHash, resetPasswordExpires: expires } }
+  );
+}
+
+/**
+ * Atomically swaps in the new password hash if (and only if) the token matches and has not expired.
+ * Because the token fields are cleared in the same operation, a token can be used exactly once.
+ * A successful reset also clears any lockout, since the owner has proven control of the mailbox.
+ * Returns the updated user, or null when the token is invalid/expired/used.
+ */
+async function consumeResetToken(tokenHash, newPasswordHash) {
+  return User.findOneAndUpdate(
+    { resetPasswordTokenHash: tokenHash, resetPasswordExpires: { $gt: new Date() } },
+    {
+      $set: { passwordHash: newPasswordHash, failedLoginAttempts: 0 },
+      $unset: { resetPasswordTokenHash: 1, resetPasswordExpires: 1, lockUntil: 1 },
+    },
+    { new: true }
+  );
+}
+
 function toPublic(user) {
   if (!user) return null;
   return {
@@ -58,4 +83,7 @@ function toPublic(user) {
   };
 }
 
-module.exports = { findByEmail, findById, create, isLocked, registerFailedLogin, resetLoginState, toPublic };
+module.exports = {
+  findByEmail, findById, create, isLocked, registerFailedLogin, resetLoginState,
+  setResetToken, consumeResetToken, toPublic,
+};

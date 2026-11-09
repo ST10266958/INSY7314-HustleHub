@@ -8,6 +8,8 @@ jest.mock('./pages/GigDetail',()=>()=> <p>Service detail</p>);
 jest.mock('./pages/Dashboard',()=>()=> <p>Dashboard page</p>);
 jest.mock('./pages/Bookings',()=>()=> <p>Bookings page</p>);
 jest.mock('./pages/AuthPage',()=>()=> <p>Authentication page</p>);
+jest.mock('./pages/ForgotPassword',()=>()=> <p>Forgot password page</p>);
+jest.mock('./pages/ResetPassword',()=>()=> <p>Reset password page</p>);
 function setup(user=null){useAuth.mockReturnValue({user,logout:jest.fn()});render(<MemoryRouter future={{v7_startTransition:true,v7_relativeSplatPath:true}}><App/></MemoryRouter>);return within(screen.getByRole('contentinfo'));}
 test('footer has working navigation and no assessment copy',()=>{const footer=setup();expect(footer.getByRole('link',{name:'HustleHub+ home'})).toHaveAttribute('href','/');expect(footer.getByRole('link',{name:'Explore services'})).toHaveAttribute('href','/gigs');expect(footer.getByRole('link',{name:'Join the community'})).toHaveAttribute('href','/register');expect(screen.queryByText(/Part 2 assessment/)).not.toBeInTheDocument();expect(screen.queryByText(/Skills that move you forward/)).not.toBeInTheDocument();});
 test('client footer points to own bookings',()=>{const footer=setup({email:'client@example.test',role:'client'});expect(footer.getByRole('link',{name:'Your bookings'})).toHaveAttribute('href','/bookings');expect(footer.queryByRole('link',{name:'Join the community'})).not.toBeInTheDocument();});

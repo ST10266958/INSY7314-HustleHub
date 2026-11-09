@@ -14,6 +14,21 @@ export function validateAuth(values,{register=false}={}) {
   if(register && !['client','freelancer'].includes(values.role)) errors.role='Choose Client or Freelancer.';
   return {errors,values:{email,password,...(register?{role:values.role}:{})}};
 }
+export function validateForgot(values) {
+  const email=text(values.email).trim();
+  const errors={};
+  if(!email) errors.email='Email is required.';
+  else if(email.length>LIMITS.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email='Enter a valid email address.';
+  return {errors,values:{email}};
+}
+export function validateReset(values) {
+  const password=text(values.password);
+  const confirm=text(values.confirm);
+  const errors={};
+  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[\s\S]{8,128}$/.test(password)) errors.password='Use 8–128 characters with uppercase, lowercase and a number.';
+  else if(password!==confirm) errors.confirm='Passwords do not match.'; // eslint-disable-line security/detect-possible-timing-attacks -- Client-side form check on the user's own two inputs; no secret is compared against an attacker's guess.
+  return {errors,values:{password}};
+}
 export function validateGig(values) {
   const title=text(values.title).trim();
   const description=text(values.description).trim();

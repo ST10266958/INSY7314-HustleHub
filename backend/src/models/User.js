@@ -22,6 +22,9 @@ const userSchema = new mongoose.Schema(
     // Account lockout state (see authController.login)
     failedLoginAttempts: { type: Number, default: 0 },
     lockUntil: { type: Date },
+    // Password reset state. Only a SHA-256 hash of the emailed token is stored, never the token itself.
+    resetPasswordTokenHash: { type: String, index: true },
+    resetPasswordExpires: { type: Date },
   },
   { timestamps: true }
 );
