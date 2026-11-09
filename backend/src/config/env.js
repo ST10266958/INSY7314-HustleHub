@@ -31,5 +31,13 @@ module.exports = {
   logDir: process.env.LOG_DIR || 'logs',
   lockoutMaxAttempts: parseInt(process.env.LOCKOUT_MAX_ATTEMPTS, 10) || 5,
   lockoutMinutes: parseInt(process.env.LOCKOUT_MINUTES, 10) || 15,
+  resetTokenMinutes: parseInt(process.env.RESET_TOKEN_MINUTES, 10) || 15,
+  smtp: {
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT, 10) || 587,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+    from: process.env.MAIL_FROM || 'HustleHub+ <no-reply@hustlehub.local>',
+  },
   auditRetentionDays: parseInt(process.env.AUDIT_RETENTION_DAYS, 10) || 90,
 };

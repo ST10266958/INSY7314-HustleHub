@@ -32,6 +32,25 @@ const loginValidation = [
   handleValidation,
 ];
 
+const passwordRules = (field) => body(field).isString()
+  .isLength({ min: 8, max: 128 }).withMessage('Password must be between 8 and 128 characters.')
+  .matches(/[a-z]/).withMessage('Password must contain a lowercase letter.')
+  .matches(/[A-Z]/).withMessage('Password must contain an uppercase letter.')
+  .matches(/[0-9]/).withMessage('Password must contain a number.');
+
+const forgotPasswordValidation = [
+  body('email').trim().notEmpty().withMessage('Email is required.')
+    .isEmail().withMessage('A valid email address is required.').normalizeEmail(),
+  handleValidation,
+];
+
+const resetPasswordValidation = [
+  // The token is 32 random bytes in hex, so anything else can be rejected before touching the database.
+  body('token').isString().matches(/^[a-f0-9]{64}$/).withMessage('Reset link is invalid or has expired.'),
+  passwordRules('password'),
+  handleValidation,
+];
+
 const createGigValidation = [
   body('title').trim().notEmpty().withMessage('Title is required.')
     .isLength({ max: 120 }).withMessage('Title must be under 120 characters.'),
@@ -73,6 +92,8 @@ module.exports = {
   auditQueryValidation,
   registerValidation,
   loginValidation,
+  forgotPasswordValidation,
+  resetPasswordValidation,
   createGigValidation,
   updateGigValidation,
   bookingValidation,
