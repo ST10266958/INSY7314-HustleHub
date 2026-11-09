@@ -2,7 +2,7 @@
 
 **Module:** INSY7314  
 **Project:** HustleHub+ — Secure Freelance Marketplace  
-**Backend contributors:** Andisa and Gia  
+**Backend contributors:** Andisa, Gia and Kivishnee 
 **Purpose:** References supporting backend architecture, API development, database integration, authentication, authorisation, security and testing.
 
 *Access dates for online sources: 10 October 2026.*
@@ -175,18 +175,29 @@
 
 ## Part 3 references
 
-- South African Revenue Service. Rates of tax for individuals (2026/27 tax year). https://www.sars.gov.za/tax-rates/income-tax/rates-of-tax-for-individuals/
-- GitHub Docs. Workflow syntax for GitHub Actions. https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions
-- GitHub Docs. About code scanning with CodeQL. https://docs.github.com/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning-with-codeql
-- GitHub Docs. Dependabot version updates. https://docs.github.com/code-security/dependabot/dependabot-version-updates
-- ESLint. Getting started with ESLint 9 (flat config). https://eslint.org/docs/latest/use/getting-started
-- eslint-plugin-security. https://github.com/eslint-community/eslint-plugin-security
-- Docker Docs. Compose file reference, multi-stage builds and build best practices. https://docs.docker.com/
-- nginx Docs. Module ngx_http_headers_module. https://nginx.org/en/docs/http/ngx_http_headers_module.html
-- MongoDB Docs. Enable access control and manage users and roles. https://www.mongodb.com/docs/manual/tutorial/enable-authentication/
-- OWASP. Top 10 Web Application Security Risks. https://owasp.org/www-project-top-ten/
-- OWASP. Logging Cheat Sheet. https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html
-- OWASP. Authentication Cheat Sheet (account lockout). https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
-- Winston. Logging library for Node.js. https://github.com/winstonjs/winston
-- Jest and Supertest documentation. https://jestjs.io/ and https://github.com/ladjs/supertest
-- Republic of South Africa. Protection of Personal Information Act 4 of 2013.
+- South African Revenue Service. Rates of tax for individuals (2026/27 tax year). [https://www.sars.gov.za/tax-rates/income-tax/rates-of-tax-for-individuals/](https://www.sars.gov.za/tax-rates/income-tax/rates-of-tax-for-individuals/)
+- GitHub Docs. Workflow syntax for GitHub Actions. [https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions](https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions)
+- GitHub Docs. About code scanning with CodeQL. [https://docs.github.com/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning-with-codeql](https://docs.github.com/code-security/code-scanning/introduction-to-code-scanning/about-code-scanning-with-codeql)
+- GitHub Docs. Dependabot version updates. [https://docs.github.com/code-security/dependabot/dependabot-version-updates](https://docs.github.com/code-security/dependabot/dependabot-version-updates)
+- ESLint. Getting started with ESLint 9 (flat config). [https://eslint.org/docs/latest/use/getting-started](https://eslint.org/docs/latest/use/getting-started)
+- eslint-plugin-security. Security rules for ESLint. [https://github.com/eslint-community/eslint-plugin-security](https://github.com/eslint-community/eslint-plugin-security)
+- Docker Docs. Docker Compose documentation and build best practices. [https://docs.docker.com/](https://docs.docker.com/)
+- nginx Docs. Module ngx_http_headers_module. [https://nginx.org/en/docs/http/ngx_http_headers_module.html](https://nginx.org/en/docs/http/ngx_http_headers_module.html)
+- MongoDB Docs. Enable access control and manage users and roles. [https://www.mongodb.com/docs/manual/tutorial/enable-authentication/](https://www.mongodb.com/docs/manual/tutorial/enable-authentication/)
+- OWASP. Top 10 Web Application Security Risks. [https://owasp.org/www-project-top-ten/](https://owasp.org/www-project-top-ten/)
+- OWASP. Logging Cheat Sheet. [https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html)
+- OWASP. Authentication Cheat Sheet. [https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html](https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html)
+- Winston. Logging library for Node.js. [https://github.com/winstonjs/winston](https://github.com/winstonjs/winston)
+- Jest. JavaScript testing framework documentation. [https://jestjs.io/](https://jestjs.io/)
+- Supertest. HTTP assertions for Node.js. [https://github.com/ladjs/supertest](https://github.com/ladjs/supertest)
+- Republic of South Africa. Protection of Personal Information Act 4 of 2013 (POPIA). [https://www.gov.za/documents/protection-personal-information-act](https://www.gov.za/documents/protection-personal-information-act)
+- Node.js Docs. Environment variables. [https://nodejs.org/en/learn/command-line/how-to-read-environment-variables-from-nodejs](https://nodejs.org/en/learn/command-line/how-to-read-environment-variables-from-nodejs)
+- Express.js. Production best practices: security. [https://expressjs.com/en/advanced/best-practice-security.html](https://expressjs.com/en/advanced/best-practice-security.html)
+- Express.js. Error handling. [https://expressjs.com/en/guide/error-handling.html](https://expressjs.com/en/guide/error-handling.html)
+- Mongoose. Schemas documentation. [https://mongoosejs.com/docs/guide.html](https://mongoosejs.com/docs/guide.html)
+- Mongoose. Validation documentation. [https://mongoosejs.com/docs/validation.html](https://mongoosejs.com/docs/validation.html)
+- npm Docs. package.json documentation. [https://docs.npmjs.com/cli/v11/configuring-npm/package-json](https://docs.npmjs.com/cli/v11/configuring-npm/package-json)
+- Jest. Testing asynchronous code. [https://jestjs.io/docs/asynchronous](https://jestjs.io/docs/asynchronous)
+- GitHub Docs. Building and testing Node.js. [https://docs.github.com/actions/automating-builds-and-tests/building-and-testing-nodejs](https://docs.github.com/actions/automating-builds-and-tests/building-and-testing-nodejs)
+- IETF. HTTP Semantics (RFC 9110). [https://www.rfc-editor.org/rfc/rfc9110](https://www.rfc-editor.org/rfc/rfc9110)
+- Postman. Newman command-line collection runner. [https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/](https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/)
