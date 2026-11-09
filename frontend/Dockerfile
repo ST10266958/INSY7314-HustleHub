@@ -11,7 +11,7 @@ ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 # ---- Stage 2: serve the static files with nginx (non-root) ----
-FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS runtime
 # The template is rendered at start-up so the CSP can include the API origin (API_ORIGIN).
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/dist /usr/share/nginx/html
