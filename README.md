@@ -583,20 +583,21 @@ A full reference list covering the technologies, libraries and security guidance
 
 ## Demonstration Evidence
 
-Evidence generated while building Part 3 is in [`docs/evidence/`](docs/evidence/). The items marked TODO are captured from the running GitHub repository and application.
+Evidence generated while building Part 3 is in [`docs/evidence/`](docs/evidence/) for text output and [`backend/screenshots/`](backend/screenshots/) for screenshots.
 
 | Requirement | Evidence |
 |---|---|
-| Tax estimation and charts | Screenshot: `docs/evidence/screenshots/dashboard-tax-insights.png` (TODO) |
-| CI/CD pipeline runs automatically | Screenshot: green run on the Actions tab, `docs/evidence/screenshots/actions-green-run.png` (TODO) |
-| Pipeline fails when a check fails | Screenshot: a run failed on purpose by a broken test, `docs/evidence/screenshots/actions-failed-run.png` (TODO) |
+| Tax estimation and charts | Screenshot: [`dashboard-tax-insights.png`](backend/screenshots/dashboard-tax-insights.png) |
+| CI/CD pipeline runs automatically | Screenshot of a green run on the Actions tab: [`part3-ci-green.png`](backend/screenshots/part3-ci-green.png) |
+| Pipeline fails when a check fails | Screenshot of a run failed on purpose by a broken unit test: [`part3-ci-red.png`](backend/screenshots/part3-ci-red.png) (captured from the temporary `test/ci-fail-demo` branch, which was deleted after the screenshot) |
 | Backend tests | [`docs/evidence/backend-tests.txt`](docs/evidence/backend-tests.txt) (71 passed) |
 | Frontend tests and build | [`docs/evidence/frontend-tests.txt`](docs/evidence/frontend-tests.txt) (97 passed), [`frontend-build.txt`](docs/evidence/frontend-build.txt) |
-| Static analysis | [`eslint-backend-raw.txt`](docs/evidence/eslint-backend-raw.txt), [`eslint-frontend-raw.txt`](docs/evidence/eslint-frontend-raw.txt), [`eslint-*-final.txt`](docs/evidence/) and the job summary screenshot (TODO) |
+| Static analysis | [`eslint-backend-raw.txt`](docs/evidence/eslint-backend-raw.txt), [`eslint-frontend-raw.txt`](docs/evidence/eslint-frontend-raw.txt), [`eslint-backend-final.txt`](docs/evidence/eslint-backend-final.txt), [`eslint-frontend-final.txt`](docs/evidence/eslint-frontend-final.txt) and the job summary screenshot [`part3-static-analysis.png`](backend/screenshots/part3-static-analysis.png) |
 | Dependency audit | [`npm-audit-backend-before.txt`](docs/evidence/npm-audit-backend-before.txt), [`npm-audit-backend-after.txt`](docs/evidence/npm-audit-backend-after.txt), [`npm-audit-frontend.txt`](docs/evidence/npm-audit-frontend.txt) |
-| Docker stack running | Screenshot of `docker compose ps` showing three healthy services, `docs/evidence/screenshots/docker-compose-ps.png` (TODO) |
-| Logging | Screenshot of `logs/audit.log` after a login, a failed login, a booking and a transaction, `docs/evidence/screenshots/audit-log.png` (TODO) |
-| Account lockout | Screenshot of the `429` response after repeated failed logins (TODO) |
+| Docker stack running | Screenshot of `docker compose ps` showing three healthy services: [`part3-docker-compose-ps.png`](backend/screenshots/part3-docker-compose-ps.png) |
+| Logging | Screenshots of `logs/audit.log` after a login ([`part3-audit-login.png`](backend/screenshots/part3-audit-login.png)), a failed login ([`part3-audit-failed-login.png`](backend/screenshots/part3-audit-failed-login.png)) and a booking + transaction ([`part3-audit-booking.png`](backend/screenshots/part3-audit-booking.png)) |
+| Account lockout | Screenshot of the `429` response after repeated failed logins: [`part3-lockout-429.png`](backend/screenshots/part3-lockout-429.png) |
+| Part 3 Newman run | [`backend/postman/newman-output-part3.txt`](backend/postman/newman-output-part3.txt) (104 requests, 145 assertions, 0 failures) and the summary screenshot [`Newman-Part3-1.png`](backend/screenshots/Newman-Part3-1.png) through [`Newman-Part3-12.png`](backend/screenshots/Newman-Part3-12.png) |
 | Demo video | See [Demonstration Videos](#demonstration-videos) |
 
 ## Team
