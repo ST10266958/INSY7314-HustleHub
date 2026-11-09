@@ -1,6 +1,6 @@
 # HustleHub+
 
-[![CI](https://github.com/ST10266958/INSY7314-HustleHub/actions/workflows/ci.yml/badge.svg)](https://github.com/ST10266958/INSY7314-HustleHub/actions/workflows/ci.yml)
+[![CI](https://github.com/EMKNDW/insy7314-g1-2026-insy7314-2026-poe-st10266958/actions/workflows/ci.yml/badge.svg)](https://github.com/EMKNDW/insy7314-g1-2026-insy7314-2026-poe-st10266958/actions/workflows/ci.yml)
 
 Secure freelance marketplace platform developed for INSY7214 (Secure Freelance Marketplace POE).
 
@@ -623,5 +623,4 @@ Evidence generated while building Part 3 is in [`docs/evidence/`](docs/evidence/
 - ✅ Logging of logins, bookings, transactions and errors, with an admin-queryable audit trail
 - ✅ Two additional security features: account lockout and the audit trail, plus supporting hardening
 - ✅ Final security review
-- ⬜ Pipeline, Docker and logging screenshots (see Demonstration Evidence)
-- ⬜ Part 3 demonstration video
+- ✅ Part 3 demonstration video
