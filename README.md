@@ -35,6 +35,7 @@ The project is built incrementally across three parts:
 - **Tax estimation (Part 3):** an approximate South African income tax estimate for the current tax year, shown with a monthly income chart, a tax-versus-take-home chart and a step-by-step explanation
 - **Logging and monitoring (Part 3):** login attempts, bookings, transactions, access denials, rate limiting and errors are logged to files and to a searchable audit trail that admins can query
 - **Account lockout (Part 3):** repeated failed logins lock the account for a short time
+- **Forgot password (Part 3):** users can request a password reset link by email (valid for 15 minutes)
 - **DevSecOps (Part 3):** GitHub Actions pipeline (lint, security static analysis, tests, dependency audit, builds, full Docker smoke test) and a Docker Compose stack
 - **Role-based access control:** each endpoint is restricted by role, and users can only modify or delete resources they own
 - **Admin oversight:** an admin account (created with a script) can list all users, gigs, bookings and transactions and remove any gig, through the API or the admin dashboard
@@ -287,7 +288,7 @@ Emails and IP addresses are personal information. Audit entries in MongoDB expir
 
 ## Additional Security Features
 
-Part 3 adds two functional security features beyond the minimum requirements, plus supporting hardening.
+Part 3 adds three functional security features beyond the minimum requirements, plus supporting hardening.
 
 ### 1. Account lockout
 
@@ -300,7 +301,20 @@ Rate limiting works per IP address. Account lockout works per account, so an att
 - **Trade-off:** the `429` for a locked account confirms that the email exists. This is accepted because the same information is not available for non-existent emails, which still receive the generic `401`, and the lock itself is the stronger protection. A real product would also notify the owner by email.
 - Tested in `backend/tests/auth.test.js` and `backend/tests/userModel.test.js`.
 
-### 2. Persistent audit trail with admin monitoring
+### 2. Forgot password
+
+Users who forget their password can request a reset link by email rather than being permanently locked out of their account.
+
+- The user calls `POST /api/auth/forgot-password` with their email.
+- The API generates a single-use, cryptographically random token, stores a hash of it against the user with an expiry of **15 minutes**, and emails a reset link containing the raw token.
+- The response is always the same generic `200` regardless of whether the email is registered, so the endpoint cannot be used to enumerate accounts.
+- The user calls `POST /api/auth/reset-password` with the token and their new password. The API checks the token has not expired, has not been used, matches the stored hash, and that the new password meets the password rules.
+- On success the token is invalidated, the password is rehashed with bcrypt, and the account is unlocked if it was in a lockout state.
+- Expired, reused, invalid or tampered tokens are all rejected with a clean `400` message that does not reveal which check failed.
+- All reset requests and completions are written to the audit trail (`auth.password.reset.requested`, `auth.password.reset.completed`) so an admin can spot abuse.
+- Tested in `backend/tests/auth.test.js`.
+
+### 3. Persistent audit trail with admin monitoring
 
 Security events are stored in MongoDB and exposed to admins through `GET /api/admin/audit-logs` and `GET /api/admin/audit-logs/summary` (see [Logging and Monitoring](#logging-and-monitoring)). The filters are whitelisted (`event` must be a known event, `outcome` one of four values, `limit` 1 to 200), so nothing user-controlled reaches the database query. Entries expire automatically. Audit writes never throw, so a database problem cannot break a request. Tested in `backend/tests/admin.test.js` and `backend/tests/audit.test.js`.
 
@@ -575,7 +589,7 @@ The Part 1 collection is at [`backend/postman/HustleHub-Part1.postman_collection
 
 - **Part 1:** https://youtu.be/7Ul6SDaJ4iQ
 - **Part 2:** https://youtu.be/mLI_OdOGr4M
-- **Part 3:** TODO add the YouTube link (shows registration and login, gig creation, a booking and transaction, the income and tax dashboard, the Docker stack running, the CI pipeline and the logs)
+- **Part 3:** https://youtu.be/Cd3MCdv7Evs
 
 ## References
 
