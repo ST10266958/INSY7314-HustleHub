@@ -1,7 +1,7 @@
 const { body, param, query, validationResult } = require('express-validator');
 const AppError = require('../utils/AppError');
 const { SELF_REGISTERABLE_ROLES } = require('../constants/roles');
-const { AUDIT_EVENTS } = require('../constants/auditEvents');
+const { AUDIT_EVENTS, AUDIT_OUTCOMES } = require('../constants/auditEvents');
 
 function handleValidation(req, res, next) {
   const errors = validationResult(req);
@@ -64,7 +64,7 @@ const mongoIdParamValidation = [
 // Whitelists every query value so nothing user-controlled can reach the database filter.
 const auditQueryValidation = [
   query('event').optional().isString().isIn(Object.values(AUDIT_EVENTS)).withMessage('Unknown event filter.'),
-  query('outcome').optional().isString().isIn(['success', 'failure', 'denied', 'info']).withMessage('Unknown outcome filter.'),
+  query('outcome').optional().isString().isIn(AUDIT_OUTCOMES).withMessage('Unknown outcome filter.'),
   query('limit').optional().isInt({ min: 1, max: 200 }).withMessage('Limit must be between 1 and 200.'),
   handleValidation,
 ];

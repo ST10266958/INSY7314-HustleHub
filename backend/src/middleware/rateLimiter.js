@@ -16,4 +16,13 @@ function createLimiter({ windowMs, max, message, name }) {
   });
 }
 
-module.exports = { createLimiter };
+// One shared limiter for the general API (reads and writes that are not login or booking).
+// 300 requests per 15 minutes per IP is far above normal use of the frontend but stops scripted floods.
+const apiLimiter = createLimiter({
+  name: 'api',
+  windowMs: 15 * 60 * 1000,
+  max: 300,
+  message: 'Too many requests. Please try again later.',
+});
+
+module.exports = { createLimiter, apiLimiter };

@@ -1,5 +1,5 @@
 const express = require('express');
-const { createLimiter } = require('../middleware/rateLimiter');
+const { createLimiter, apiLimiter } = require('../middleware/rateLimiter');
 const { requireAuth } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/rbacMiddleware');
 const { ROLES } = require('../constants/roles');
@@ -11,6 +11,8 @@ const {
 } = require('../controllers/bookingController');
 
 const router = express.Router();
+
+router.use(apiLimiter);
 
 const bookingLimiter = createLimiter({
   name: 'booking',

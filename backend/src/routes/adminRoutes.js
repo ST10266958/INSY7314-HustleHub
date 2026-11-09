@@ -1,4 +1,5 @@
 const express = require('express');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { requireAuth } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/rbacMiddleware');
 const { ROLES } = require('../constants/roles');
@@ -15,6 +16,7 @@ const {
 
 const router = express.Router();
 
+router.use(apiLimiter);
 router.use(requireAuth, requireRole(ROLES.ADMIN));
 
 router.get('/users', listUsers);

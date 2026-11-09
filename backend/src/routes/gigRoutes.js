@@ -1,4 +1,5 @@
 const express = require('express');
+const { apiLimiter } = require('../middleware/rateLimiter');
 const { requireAuth } = require('../middleware/authMiddleware');
 const { requireRole } = require('../middleware/rbacMiddleware');
 const { ROLES } = require('../constants/roles');
@@ -17,6 +18,8 @@ const {
 } = require('../controllers/gigController');
 
 const router = express.Router();
+
+router.use(apiLimiter);
 
 router.get('/', listGigs);
 router.get('/mine', requireAuth, requireRole(ROLES.FREELANCER), getMyGigs);

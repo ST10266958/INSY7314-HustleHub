@@ -16,7 +16,7 @@ describe('admin audit trail', () => {
     AuditLog.find.mockReturnValue(chain([{ event: 'auth.login.failed' }]));
     const res = await request(app).get('/api/admin/audit-logs?event=auth.login.failed&limit=10').set('Authorization', admin());
     expect(res.status).toBe(200);
-    expect(AuditLog.find).toHaveBeenCalledWith({ event: 'auth.login.failed' });
+    expect(AuditLog.find).toHaveBeenCalledWith({ event: { $eq: 'auth.login.failed' } });
     expect(res.body.data.logs).toHaveLength(1);
   });
 

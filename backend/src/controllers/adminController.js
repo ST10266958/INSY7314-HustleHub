@@ -7,6 +7,7 @@ const Gig = require('../models/Gig');
 const Booking = require('../models/Booking');
 const Transaction = require('../models/Transaction');
 const AuditLog = require('../models/AuditLog');
+const { AUDIT_OUTCOMES } = require('../constants/auditEvents');
 
 const LIST_LIMIT = 200;
 
@@ -59,9 +60,13 @@ const deleteGig = asyncHandler(async (req, res) => {
 
 // Security monitoring: newest audit events first, optionally filtered by event and outcome.
 const listAuditLogs = asyncHandler(async (req, res) => {
+  // The route validator already whitelists these values. We also look each one up in our own
+  // constant lists and compare with $eq, so the query only ever holds a known string, never a raw query value.
   const filter = {};
-  if (req.query.event) filter.event = req.query.event;
-  if (req.query.outcome) filter.outcome = req.query.outcome;
+  const event = Object.values(AUDIT_EVENTS).find((known) => known === req.query.event);
+  const outcome = AUDIT_OUTCOMES.find((known) => known === req.query.outcome);
+  if (event) filter.event = { $eq: event };
+  if (outcome) filter.outcome = { $eq: outcome };
   const limit = req.query.limit ? parseInt(req.query.limit, 10) : 100;
 
   const logs = await AuditLog.find(filter).sort({ createdAt: -1 }).limit(limit);

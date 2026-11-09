@@ -16,4 +16,6 @@ const AUDIT_EVENTS = Object.freeze({
   ADMIN_GIG_REMOVED: 'admin.gig.removed',
 });
 
-module.exports = { AUDIT_EVENTS };
+const AUDIT_OUTCOMES = Object.freeze(['success', 'failure', 'denied', 'info']);
+
+module.exports = { AUDIT_EVENTS, AUDIT_OUTCOMES };
