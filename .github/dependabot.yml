@@ -2,16 +2,31 @@ version: 2
 updates:
   - package-ecosystem: npm
     directory: /backend
-    schedule: { interval: weekly }
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /frontend
-    schedule: { interval: weekly }
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@eslint/js"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: docker
     directory: /backend
-    schedule: { interval: weekly }
+    schedule:
+      interval: weekly
   - package-ecosystem: docker
     directory: /frontend
-    schedule: { interval: weekly }
+    schedule:
+      interval: weekly
   - package-ecosystem: github-actions
     directory: /
-    schedule: { interval: weekly }
+    schedule:
+      interval: weekly
